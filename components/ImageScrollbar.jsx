@@ -8,39 +8,53 @@ const LeftArrow = () => {
   const { scrollPrev } = useContext(VisibilityContext);
 
   return (
-    <Flex justifyContent='center' alignItems='center' marginRight='1'>
+    <Flex justifyContent="center" alignItems="center" marginRight="1">
       <Icon
         as={FaArrowAltCircleLeft}
         onClick={() => scrollPrev()}
-        fontSize='2xl'
-        cursor='pointer'
-        d={['none','none','none','block']}
+        fontSize="2xl"
+        cursor="pointer"
+        display={['none','none','none','block']}
       />
     </Flex>
   );
-}
+};
 
 const RightArrow = () => {
   const { scrollNext } = useContext(VisibilityContext);
 
   return (
-    <Flex justifyContent='center' alignItems='center' marginLeft='1'>
+    <Flex justifyContent="center" alignItems="center" marginLeft="1">
       <Icon
         as={FaArrowAltCircleRight}
         onClick={() => scrollNext()}
-        fontSize='2xl'
-        cursor='pointer'
-        d={['none','none','none','block']}
-    />
+        fontSize="2xl"
+        cursor="pointer"
+        display={['none','none','none','block']}
+      />
     </Flex>
   );
-}
-export default function ImageSrollbar({ data }) {
+};
+
+export default function ImageScrollbar({ data }) {
   return (
-    <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow} style={{ overflow: 'hidden' }} >
+    <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow} style={{ overflow: 'hidden' }}>
       {data.map((item) => (
-        <Box width='910px' itemId={item.id} overflow='hidden' p='1'>
-          <Image placeholder="blur" blurDataURL={item.url} src={item.url} width={1000} height={500}  sizes="(max-width: 500px) 100px, (max-width: 1023px) 400px, 1000px" />
+        <Box
+          key={item.id}          // ✅ Add key for React
+          width="910px"
+          itemId={item.id}
+          overflow="hidden"
+          p="1"
+        >
+          <Image
+            src={item.url || '/demo.jpg'}    // fallback in case url is missing
+            width={1000}
+            height={500}
+            sizes="(max-width: 500px) 100px, (max-width: 1023px) 400px, 1000px"
+            unoptimized={true}               // ✅ bypass Next.js optimization for placeholders
+            alt="property"
+          />
         </Box>
       ))}
     </ScrollMenu>

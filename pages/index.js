@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Flex, Box, Text, Button } from '@chakra-ui/react';
 
+import headerImg from '../assets/images/Header.png';
+
 import Property from '../components/Property';
 
 // ---------------- Mock Data ----------------
@@ -32,40 +34,21 @@ const mockProperties = [
   },
 ];
 
-// ---------------- Banner Component ----------------
-const Banner = ({ purpose, title1, title2, desc1, desc2, buttonText, linkName, imageUrl }) => (
-  <Flex flexWrap='wrap' justifyContent='center' alignItems='center' m='10'>
-    <Image src={imageUrl} width={500} height={300} alt='Banner' />
-    <Box p='5'>
-      <Text color='gray.500' fontSize='sm' fontWeight='medium'>{purpose}</Text>
-      <Text fontSize='3xl' fontWeight='bold'>{title1}<br />{title2}</Text>
-      <Text fontSize='lg' pt='3' pb='3' color='gray.700'>{desc1}<br />{desc2}</Text>
-      <Link href={linkName} passHref>
-        <Button fontSize='xl' bg='blue.300' color='white'>
-          {buttonText}
-        </Button>
-      </Link>
-    </Box>
-  </Flex>
-);
-
 // ---------------- Home Page ----------------
 const Home = () => (
-  <Box>
-    {/* Rent Banner */}
-    <Banner
-      purpose='RENT A HOME'
-      title1='Rental Homes for'
-      title2='Everyone'
-      desc1='Explore from Apartments, builder floors, villas'
-      desc2='and more'
-      buttonText='Explore Renting'
-      linkName='/search?purpose=for-rent'
-      imageUrl='https://www.hellolanding.com/blog/wp-content/uploads/2020/05/image-3.png'
-    />
+    <Box>
+    {/* ------- Header Image (Replacing Banner) ------- */}
+    <Box width="100%" height="450px" position="relative">
+      <Image
+        src= {headerImg} 
+        alt="Header"
+        layout="fill"
+        style={{ objectFit: 'cover' }}
+      />
+    </Box>
 
-    {/* Mock Properties */}
-    <Flex flexWrap='wrap'>
+    {/* ------- Properties Grid ------- */}
+    <Flex flexWrap="wrap" justifyContent="center" mt="10">
       {mockProperties.map((property) => (
         <Property property={property} key={property.id} />
       ))}

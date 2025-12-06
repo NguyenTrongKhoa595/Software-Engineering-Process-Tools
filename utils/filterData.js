@@ -1,24 +1,6 @@
 export const filterData = [
   {
     items: [
-      { name: 'Buy', value: 'for-sale' },
-      { name: 'Rent', value: 'for-rent' },
-    ],
-    placeholder: 'Purpose',
-    queryName: 'purpose',
-  },
-  {
-    items: [
-      { name: 'Daily', value: 'daily' },
-      { name: 'Weekly', value: 'weekly' },
-      { name: 'Monthly', value: 'monthly' },
-      { name: 'Yearly', value: 'yearly' },
-    ],
-    placeholder: 'Rent Frequency',
-    queryName: 'rentFrequency',
-  },
-  {
-    items: [
       { name: '10,000', value: '10000' },
       { name: '20,000', value: '20000' },
       { name: '30,000', value: '30000' },
@@ -27,7 +9,7 @@ export const filterData = [
       { name: '60,000', value: '60000' },
       { name: '85,000', value: '85000' },
     ],
-    placeholder: 'Min Price(AED)',
+    placeholder: 'Min Price',
     queryName: 'minPrice',
   },
   {
@@ -47,75 +29,10 @@ export const filterData = [
       { name: '700,000', value: '700000' },
       { name: '800,000', value: '800000' },
       { name: '900,000', value: '900000' },
-      { name: '1000,000', value: '1000000' },
+      { name: '1,000,000', value: '1000000' },
     ],
-    placeholder: 'Max Price(AED)',
+    placeholder: 'Max Price',
     queryName: 'maxPrice',
-  },
-  {
-    items: [
-      { name: 'Lowest Price', value: 'price-asc' },
-      { name: 'Highest Price', value: 'price-des' },
-      { name: 'Newest', value: 'date-asc' },
-      { name: 'Oldest', value: 'date-desc' },
-      { name: 'Verified', value: 'verified-score' },
-      { name: 'City Level Score', value: 'city-level-score' },
-    ],
-    placeholder: 'Sort',
-    queryName: 'sort',
-  },
-  {
-    items: [
-      { name: '1000', value: '1000' },
-      { name: '2000', value: '2000' },
-      { name: '3000', value: '3000' },
-      { name: '4000', value: '4000' },
-      { name: '5000', value: '5000' },
-      { name: '10000', value: '10000' },
-      { name: '20000', value: '20000' },
-    ],
-    placeholder: 'Max Area(sqft)',
-    queryName: 'areaMax',
-  },
-  {
-    items: [
-      { name: '1', value: '1' },
-      { name: '2', value: '2' },
-      { name: '3', value: '3' },
-      { name: '4', value: '4' },
-      { name: '5', value: '5' },
-      { name: '6', value: '6' },
-      { name: '7', value: '7' },
-      { name: '8', value: '8' },
-      { name: '9', value: '9' },
-      { name: '10', value: '10' },
-    ],
-    placeholder: 'Rooms',
-    queryName: 'roomsMin',
-  },
-  {
-    items: [
-      { name: '1', value: '1' },
-      { name: '2', value: '2' },
-      { name: '3', value: '3' },
-      { name: '4', value: '4' },
-      { name: '5', value: '5' },
-      { name: '6', value: '6' },
-      { name: '7', value: '7' },
-      { name: '8', value: '8' },
-      { name: '9', value: '9' },
-      { name: '10', value: '10' },
-    ],
-    placeholder: 'Baths',
-    queryName: 'bathsMin',
-  },
-  {
-    items: [
-      { name: 'Furnished', value: 'furnished' },
-      { name: 'Unfurnished', value: 'unfurnished' },
-    ],
-    placeholder: 'Furnish Type',
-    queryName: 'furnishingStatus',
   },
   {
     items: [
@@ -132,64 +49,29 @@ export const filterData = [
     placeholder: 'Property Type',
     queryName: 'categoryExternalID',
   },
+  {
+    items: [
+      { name: 'Downtown', value: '201' },
+      { name: 'Marina', value: '202' },
+      { name: 'Palm Jumeirah', value: '203' },
+      { name: 'Business Bay', value: '204' },
+      { name: 'Jumeirah Village', value: '205' },
+      { name: 'Al Barsha', value: '206' },
+      { name: 'Dubai Silicon Oasis', value: '207' },
+      { name: 'Deira', value: '208' },
+    ],
+    placeholder: 'Location',
+    queryName: 'locationExternalIDs',
+  },
 ];
 
 export const getFilterValues = (filterValues) => {
-  const {
-    purpose,
-    rentFrequency,
-    categoryExternalID,
-    minPrice,
-    maxPrice,
-    areaMax,
-    roomsMin,
-    bathsMin,
-    sort,
-    locationExternalIDs,
-  } = filterValues;
+  const { minPrice, maxPrice, categoryExternalID, locationExternalIDs } = filterValues;
 
-  const values = [
-    {
-      name: 'purpose',
-      value: purpose,
-    },
-    {
-      name: 'rentFrequency',
-      value: rentFrequency,
-    },
-    {
-      name: 'minPrice',
-      value: minPrice,
-    },
-    {
-      name: 'maxPrice',
-      value: maxPrice,
-    },
-    {
-      name: 'areaMax',
-      value: areaMax,
-    },
-    {
-      name: 'roomsMin',
-      value: roomsMin,
-    },
-    {
-      name: 'bathsMin',
-      value: bathsMin,
-    },
-    {
-      name: 'sort',
-      value: sort,
-    },
-    {
-      name: 'locationExternalIDs',
-      value: locationExternalIDs,
-    },
-    {
-      name: 'categoryExternalID',
-      value: categoryExternalID,
-    },
+  return [
+    { name: 'minPrice', value: minPrice },
+    { name: 'maxPrice', value: maxPrice },
+    { name: 'categoryExternalID', value: categoryExternalID },
+    { name: 'locationExternalIDs', value: locationExternalIDs },
   ];
-
-  return values;
 };

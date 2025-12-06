@@ -6,6 +6,8 @@ import headerImg from '../assets/images/Header.png';
 
 import Property from '../components/Property';
 
+import SearchFilters from '../components/SearchFilters';
+
 // ---------------- Mock Data ----------------
 const mockProperties = [
   {
@@ -45,6 +47,18 @@ const Home = () => (
         layout="fill"
         style={{ objectFit: 'cover' }}
       />
+
+      {/* ⭐ Place SearchFilters INSIDE HEADER */}
+      <Box
+        position="absolute"
+        bottom="100px"
+        left="50%"
+        transform="translateX(-50%)"
+        width="70%"   // Keep it responsive
+        maxWidth="70%"
+      >
+        <SearchFilters />
+      </Box>
     </Box>
 
     {/* ------- Properties Grid ------- */}

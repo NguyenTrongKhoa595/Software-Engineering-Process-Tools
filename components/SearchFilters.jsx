@@ -9,18 +9,18 @@ export default function SearchFilters() {
   const router = useRouter();
 
   const searchProperties = (filterValues) => {
-    const path = router.pathname;
-    const { query } = router;
+  const path = router.pathname;
+  const { query } = router;
 
-    const values = getFilterValues(filterValues);
+  const newQuery = { ...query, ...filterValues }; // merge with existing query
 
-    values.forEach((item) => {
-      if (item.value && filterValues?.[item.name]) {
-        query[item.name] = item.value;
-      }
-    });
+  Object.keys(newQuery).forEach((key) => {
+    if (newQuery[key] === '' || newQuery[key] === undefined) {
+      delete newQuery[key];
+    }
+  });
 
-    router.push({ pathname: path, query });
+  router.push({ pathname: path, query: newQuery });
   };
 
   return (

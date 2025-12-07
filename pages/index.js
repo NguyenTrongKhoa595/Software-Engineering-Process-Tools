@@ -8,39 +8,7 @@ import Property from '../components/Property';
 
 import SearchFilters from '../components/SearchFilters';
 
-// ---------------- Mock Data ----------------
-const mockProperties = [
-  {
-    id: '1',
-    coverPhoto: { url: 'https://www.hellolanding.com/blog/wp-content/uploads/2020/05/image-3.png' },
-    price: 500000,
-    rentFrequency: 'yearly',
-    rooms: 3,
-    title: 'Beautiful Family Home',
-    baths: 2,
-    area: 1200,
-    agency: { logo: { url: 'https://plus.unsplash.com/premium_photo-1711697144877-b068f748bcd1?q=80&w=830&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' } },
-    isVerified: true,
-    categoryExternalID: 'Villa',
-    locationExternalIDs: 'Jumeirah Village',
-    availabilityExternalIDs: 'now',
-  },
-  {
-    id: '2',
-    coverPhoto: { url: 'https://www.hellolanding.com/blog/wp-content/uploads/2020/05/image-3.png' },
-    price: 750000,
-    rentFrequency: 'yearly',
-    rooms: 4,
-    title: 'Luxury Villa with Pool',
-    baths: 3,
-    area: 2000,
-    agency: { logo: { url: 'https://plus.unsplash.com/premium_photo-1711697144877-b068f748bcd1?q=80&w=830&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' } },
-    isVerified: true,
-    categoryExternalID: 'Penthouses',
-    locationExternalIDs: 'Marina',
-    availabilityExternalIDs: 'unavailable',
-  },
-];
+import { mockProperties } from '../utils/mockProperties';
 
 // ---------------- Home Page ----------------
 const Home = () => {

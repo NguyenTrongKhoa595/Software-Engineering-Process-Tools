@@ -23,7 +23,7 @@ const Property = ({ property }) => {
   } = property;
 
   return (
-    <Link href={`/property/${id}`} passHref>
+    <Link href={{ pathname: '/property', query: { id } }} passHref>
       <Flex
         flexWrap="wrap"
         w="420px"

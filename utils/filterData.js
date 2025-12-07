@@ -36,42 +36,51 @@ export const filterData = [
   },
   {
     items: [
-      { name: 'Apartment', value: '4' },
-      { name: 'Townhouses', value: '16' },
-      { name: 'Villas', value: '3' },
-      { name: 'Penthouses', value: '18' },
-      { name: 'Hotel Apartments', value: '21' },
-      { name: 'Villa Compound', value: '19' },
-      { name: 'Residential Plot', value: '14' },
-      { name: 'Residential Floor', value: '12' },
-      { name: 'Residential Building', value: '17' },
+      { name: 'Apartment', value: 'Apartment' },
+      { name: 'Townhouses', value: 'Townhouses' },
+      { name: 'Villas', value: 'Villas' },
+      { name: 'Penthouses', value: 'Penthouses' },
+      { name: 'Hotel Apartments', value: 'Hotel Apartments' },
+      { name: 'Villa Compound', value: 'Villa Compound' },
+      { name: 'Residential Plot', value: 'Residential Plot' },
+      { name: 'Residential Floor', value: 'Residential Floor' },
+      { name: 'Residential Building', value: 'Residential Building' },
     ],
     placeholder: 'Property Type',
     queryName: 'categoryExternalID',
   },
   {
     items: [
-      { name: 'Downtown', value: '201' },
-      { name: 'Marina', value: '202' },
-      { name: 'Palm Jumeirah', value: '203' },
-      { name: 'Business Bay', value: '204' },
-      { name: 'Jumeirah Village', value: '205' },
-      { name: 'Al Barsha', value: '206' },
-      { name: 'Dubai Silicon Oasis', value: '207' },
-      { name: 'Deira', value: '208' },
+      { name: 'Downtown', value: 'Downtown' },
+      { name: 'Marina', value: 'Marina' },
+      { name: 'Palm Jumeirah', value: 'Palm Jumeirah' },
+      { name: 'Business Bay', value: 'Business Bay' },
+      { name: 'Jumeirah Village', value: 'Jumeirah Village' },
+      { name: 'Al Barsha', value: 'Al Barsha' },
+      { name: 'Dubai Silicon Oasis', value: 'Dubai Silicon Oasis' },
+      { name: 'Deira', value: 'Deira' },
     ],
     placeholder: 'Location',
     queryName: 'locationExternalIDs',
   },
+  {
+    items: [
+      { name: 'Available Now', value: 'now' },
+      { name: 'Unavailable', value: 'unavailable' },
+    ],
+    placeholder: 'Availability',
+    queryName: 'availabilityExternalIDs',
+  },
 ];
 
 export const getFilterValues = (filterValues) => {
-  const { minPrice, maxPrice, categoryExternalID, locationExternalIDs } = filterValues;
+  const { minPrice, maxPrice, categoryExternalID, locationExternalIDs, availabilityExternalIDs } = filterValues;
 
   return [
     { name: 'minPrice', value: minPrice },
     { name: 'maxPrice', value: maxPrice },
     { name: 'categoryExternalID', value: categoryExternalID },
     { name: 'locationExternalIDs', value: locationExternalIDs },
+    { name: 'availabilityExternalIDs', value: availabilityExternalIDs },
   ];
 };

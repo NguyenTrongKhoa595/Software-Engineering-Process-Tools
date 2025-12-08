@@ -10,7 +10,7 @@ export default function LoginPage() {
       {/* LEFT IMAGE */}
       <Box w="50%" display={{ base: "none", md: "block" }}>
         <Image
-          src="https://www.confident-group.com/wp-content/uploads/2024/12/types-of-real-estate-overview-1024x683.jpg"
+          src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVhbCUyMGVzdGF0ZXxlbnwwfHwwfHx8MA%3D%3D"
           alt="login"
           h="100%"
           w="100%"
@@ -69,7 +69,7 @@ export default function LoginPage() {
 
           <Flex w="100%" justify="space-between" mt={6} color="gray.600" fontSize="sm">
             <Checkbox>Remember me</Checkbox>
-            <Text as="a" textDecoration="underline" cursor="pointer">
+            <Text as="a" textDecoration="underline" cursor="pointer" onClick={() => router.push("/forgot-password")}>
               Forgot password?
             </Text>
           </Flex>

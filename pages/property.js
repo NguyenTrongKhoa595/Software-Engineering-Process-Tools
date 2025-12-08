@@ -1,9 +1,11 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { fetchApi } from '../utils/fetchApi';
 
 export default function PropertyDetail({ property }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     function replaceFeather() {
@@ -85,7 +87,7 @@ export default function PropertyDetail({ property }) {
                     key={i}
                     src={getSizedImage(src, '640x360')}
                     alt={`Property view ${i + 1}`}
-                    className={`thumbnail w-32 h-20 object-cover rounded-lg cursor-pointer border-2 transition-all ${i === activeIndex ? 'border-primary-500' : 'border-transparent'}`}
+                    className={`thumbnail w-32 h-20 object-cover rounded-lg cursor-pointer border-2 transform transition-all duration-200 ${i === activeIndex ? 'border-blue-500 scale-105' : 'border-transparent'}`}
                     onClick={() => setActiveIndex(i)}
                   />
                 ))}
@@ -160,7 +162,17 @@ export default function PropertyDetail({ property }) {
                     <span>{property.landlordPhone || 'n/a'}</span>
                   </div>
                 </div>
-                <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center">
+                <button
+                  onClick={() => {
+                    sessionStorage.setItem('paymentData', JSON.stringify({
+                      price: property.price,
+                      id: property.id,
+                      title: property.title
+                    }));
+                    router.push('/payment');
+                  }}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center"
+                >
                   <i data-feather="corner-down-right" className="w-4 h-4 mr-2"></i>
                   Rent This Property
                 </button>
@@ -190,23 +202,24 @@ export async function getServerSideProps(context) {
   // Map fields to the shape used in the page
   const mapped = property
     ? {
-        title: property.title,
-        coverPhoto: property.coverPhoto || { url: '' },
-        photos: property.photos || null,
-        price: property.price,
-        rentFrequency: property.rentFrequency,
-        rooms: property.rooms || property.room || '-',
-        baths: property.baths || property.bath || '-',
-        area: property.area,
-        description: property.description || property.summary || '',
-        location: property.location || property.city || '',
-        landlordName: property.landlordName || null,
-        landlordEmail: property.landlordEmail || null,
-        landlordPhone: property.landlordPhone || null,
-        landlordPhoto: property.landlordPhoto || null,
-        yearBuilt: property.yearBuilt || null,
-        garage: property.garage || null,
-      }
+      id: property.id,
+      title: property.title,
+      coverPhoto: property.coverPhoto || { url: '' },
+      photos: property.photos || null,
+      price: property.price,
+      rentFrequency: property.rentFrequency,
+      rooms: property.rooms || property.room || '-',
+      baths: property.baths || property.bath || '-',
+      area: property.area,
+      description: property.description || property.summary || '',
+      location: property.location || property.city || '',
+      landlordName: property.landlordName || null,
+      landlordEmail: property.landlordEmail || null,
+      landlordPhone: property.landlordPhone || null,
+      landlordPhoto: property.landlordPhoto || null,
+      yearBuilt: property.yearBuilt || null,
+      garage: property.garage || null,
+    }
     : null;
 
   return {

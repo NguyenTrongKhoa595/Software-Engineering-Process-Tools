@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function PaymentPage() {
   const [fullName, setFullName] = useState('');
@@ -7,6 +8,10 @@ export default function PaymentPage() {
   const [ccv, setCcv] = useState('');
   const [expDate, setExpDate] = useState(''); // YYYY-MM from <input type="month">
   const [message, setMessage] = useState(null); // { type: 'error'|'success', text }
+  const router = useRouter();
+  const [priceFromQuery, setPriceFromQuery] = useState(null);
+  const [propertyTitle, setPropertyTitle] = useState('');
+  const [billId, setBillId] = useState('PROP-2023-0567');
 
   // Compute min for month picker (current month)
   function getMinMonth() {
@@ -17,6 +22,24 @@ export default function PaymentPage() {
   }
 
   useEffect(() => {
+    // Read from sessionStorage instead of query params
+    const storedData = sessionStorage.getItem('paymentData');
+    if (storedData) {
+      try {
+        const { price, id, title } = JSON.parse(storedData);
+        if (price) {
+          const n = Number(String(price).replace(/[^0-9.-]+/g, ''));
+          if (!Number.isNaN(n)) setPriceFromQuery(n);
+        }
+        if (id) setBillId(String(id));
+        if (title) setPropertyTitle(String(title));
+        // Clear the data after reading (optional, for security)
+        // sessionStorage.removeItem('paymentData');
+      } catch (e) {
+        console.error('Error reading payment data:', e);
+      }
+    }
+
     // Replace feather icons after mount
     try {
       if (typeof window !== 'undefined' && window.feather && typeof window.feather.replace === 'function') {
@@ -30,7 +53,7 @@ export default function PaymentPage() {
         if (typeof window !== 'undefined' && window.feather && typeof window.feather.replace === 'function') {
           window.feather.replace();
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 200);
     return () => clearTimeout(t);
   }, []);
@@ -102,6 +125,7 @@ export default function PaymentPage() {
 
     // All good
     showMessage('success', 'Payment processed successfully!');
+    sessionStorage.removeItem('paymentData');
   }
 
   return (
@@ -159,7 +183,7 @@ export default function PaymentPage() {
                       <label htmlFor="ccv" className="block text-sm font-medium text-gray-700 mb-1">CCV</label>
                       <div className="relative">
                         <i data-feather="lock" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input id="ccv" name="ccv" value={ccv} onChange={(e) => setCcv(e.target.value.replace(/\D/g, '').slice(0,3))}
+                        <input id="ccv" name="ccv" value={ccv} onChange={(e) => setCcv(e.target.value.replace(/\D/g, '').slice(0, 3))}
                           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="123" required />
                       </div>
@@ -184,7 +208,7 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            {}
+            { }
             <div className="lg:w-1/2">
               <div className="bg-gray-100 rounded-xl shadow-lg p-8 sticky top-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Payment Summary</h2>
@@ -192,11 +216,15 @@ export default function PaymentPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Bill Number</span>
-                    <span className="font-medium">PROP-2023-0567</span>
+                    <span className="font-medium">{billId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Property</span>
+                    <span className="font-medium">{propertyTitle || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Property Price</span>
-                    <span className="font-medium">$1,250,000</span>
+                    <span className="font-medium">{priceFromQuery ? `$${priceFromQuery.toLocaleString()}` : '$1,250,000'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Processing Fee</span>
@@ -204,14 +232,14 @@ export default function PaymentPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">VAT (20%)</span>
-                    <span className="font-medium">$250,000</span>
+                    <span className="font-medium">{priceFromQuery ? `$${Math.round(priceFromQuery * 0.2).toLocaleString()}` : '$250,000'}</span>
                   </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold">Total Amount</span>
-                    <span className="text-xl font-bold text-blue-600">$1,500,250</span>
+                    <span className="text-xl font-bold text-blue-600">{priceFromQuery ? `$${(priceFromQuery + 250 + Math.round(priceFromQuery * 0.2)).toLocaleString()}` : '$1,500,250'}</span>
                   </div>
                 </div>
 

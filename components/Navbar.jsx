@@ -1,13 +1,7 @@
 import Link from 'next/link';
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Flex, Box, Spacer, HStack, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, PopoverArrow, VStack, Text, Avatar } from '@chakra-ui/react';
+import { IconButton, Flex, Box, Spacer, HStack } from '@chakra-ui/react';
 import { FaUserCircle } from 'react-icons/fa';
-import { MdNotifications } from 'react-icons/md';
-
-const notifications = [
-  { sender: "RentMate System", message: "Your rent of $1200 is due tomorrow", timeAgo: "0 min" },
-  { sender: "Maintenance Team", message: 'Your request "Leaking faucet" is in progress', timeAgo: "6 min" },
-  { sender: "Admin", message: "New update available", timeAgo: "15 min" },
-];
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
   return (
@@ -65,38 +59,7 @@ const Navbar = () => {
 
       {/* Right Side */}
       <HStack spacing="4">
-        {/* Notification Dropdown */}
-        <Popover placement="bottom-end">
-          <PopoverTrigger>
-            <IconButton
-              aria-label="Notifications"
-              icon={<MdNotifications size={24} />}
-              variant="ghost"
-            />
-          </PopoverTrigger>
-
-          <PopoverContent w="350px">
-            <PopoverArrow />
-            <PopoverHeader fontWeight="bold">Notifications</PopoverHeader>
-
-            <PopoverBody>
-              <VStack align="stretch" spacing="4">
-                {notifications.map((item, i) => (
-                  <HStack key={i} align="start" spacing="3">
-                    <Avatar name={item.sender} size="sm" />
-                    <VStack align="start" spacing="1">
-                      <Text fontWeight="semibold">{item.sender}</Text>
-                      <Text fontSize="sm" color="gray.600">{item.message}</Text>
-                      <Text fontSize="xs" color="gray.500">{item.timeAgo}</Text>
-                    </VStack>
-                  </HStack>
-                ))}
-              </VStack>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-
-        {/* User Icon */}
+        <NotificationDropdown />
         <IconButton
           aria-label="profile"
           icon={<FaUserCircle size={28} />}

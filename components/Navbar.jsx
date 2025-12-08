@@ -26,13 +26,9 @@ const Navbar = () => {
       {/* Center Menu Items */}
       <HStack spacing="8" fontSize="lg" fontWeight="medium">
         {["Documents", "Communication", "Payments", "Requests"].map((label) => (
+        <Link href={`/${label.toLowerCase()}`} key={label} passHref>
           <Box
-            key={label}
-            as={Link}
-            href={`/${label.toLowerCase()}`}
             position="relative"
-            _hover={{ color: "blue.600" }}
-            transition="color 0.2s ease"
             pb="1"
             cursor="pointer"
             _before={{
@@ -49,9 +45,11 @@ const Navbar = () => {
               color: "blue.600",
               _before: { width: "100%" },
             }}
+            transition="color 0.2s ease"
           >
             {label}
           </Box>
+        </Link>
         ))}
       </HStack>
 

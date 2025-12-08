@@ -1,6 +1,10 @@
 import { Box, Flex, Image, Input, Button, Text, Checkbox } from "@chakra-ui/react";
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
+
+  const router = useRouter();
+
   return (
     <Flex h="100vh" w="100%" >
       {/* LEFT IMAGE */}
@@ -84,7 +88,7 @@ export default function LoginPage() {
 
           <Text mt={4} fontSize="sm" color="gray.600">
             Don’t have an account?{" "}
-            <Text as="a" color="blue.400" cursor="pointer" _hover={{ textDecoration: "underline" }}>
+            <Text as="a" color="blue.400" cursor="pointer" _hover={{ textDecoration: "underline" }} onClick={() => router.push("/signup")} >
               Sign up
             </Text>
           </Text>

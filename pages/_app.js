@@ -5,9 +5,11 @@ import NProgress from 'nprogress';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import Layout from '../components/Layout';
-import 'nprogress/nprogress.css'; // Import CSS directly
+import 'nprogress/nprogress.css';
 
 function MyApp({ Component, pageProps }) {
+  const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
+
   useEffect(() => {
     NProgress.configure({ showSpinner: false });
 
@@ -18,7 +20,6 @@ function MyApp({ Component, pageProps }) {
     Router.events.on('routeChangeComplete', handleStop);
     Router.events.on('routeChangeError', handleStop);
 
-    // Clean up listeners on unmount
     return () => {
       Router.events.off('routeChangeStart', handleStart);
       Router.events.off('routeChangeComplete', handleStop);
@@ -28,9 +29,7 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ChakraProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </ChakraProvider>
   );
 }

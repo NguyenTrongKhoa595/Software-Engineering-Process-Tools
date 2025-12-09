@@ -1,32 +1,113 @@
 import Link from 'next/link';
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Flex, Box, Spacer } from '@chakra-ui/react';
-import { FcMenu, FcHome, FcAbout } from 'react-icons/fc';
-import { BsSearch } from 'react-icons/bs';
-import { FiKey } from 'react-icons/fi';
+import {
+  Flex,
+  Box,
+  Image,
+  HStack,
+  Spacer,
+} from "@chakra-ui/react";
 
-const Navbar = () => (
-  <Flex p='2' borderBottom='1px' borderColor='gray.100'>
-    <Box fontSize='3xl' color='blue.400' fontWeight='bold'>
-      <Link href='/' paddingLeft='2'>Realtor</Link>
-    </Box>
-    <Spacer />
-    <Box>
-      <Menu>
-        <MenuButton as={IconButton} icon={<FcMenu />} variant='outline' color='red.400' />
-        <MenuList>
-          <Link href='/' passHref>
-            <MenuItem icon={<FcHome />}>Home</MenuItem>
-          </Link>
-          <Link href='/search' passHref>
-            <MenuItem icon={<BsSearch />}>Search</MenuItem>
-          </Link>
-          <Link href='/search?purpose=for-rent' passHref>
-            <MenuItem icon={<FiKey />}>Rent Property</MenuItem>
-          </Link>
-        </MenuList>
-      </Menu>
-    </Box>
-  </Flex>
-);
+import { BsChatDots, BsCurrencyDollar, BsBell, BsPerson, BsFileEarmarkText } from "react-icons/bs";
+import { FiLogOut } from "react-icons/fi";
 
-export default Navbar;
+export default function Navbar() {
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    // TODO: attach your logout API here
+  };
+
+  return (
+    <Flex
+      w="100%"
+      h="90px"
+      align="center"
+      px={8}
+      position="absolute"
+      top="0"
+      left="0"
+      right="0"
+      zIndex="10"
+      bg="transparent"
+      border="none"
+    >
+{/*        */}{/* LEFT LOGO */}
+{/*       <Flex align="center" gap={3}> */}
+{/*         <Image */}
+{/*           src="https://cdn-icons-png.flaticon.com/512/727/727590.png" */}
+{/*           w="45px" */}
+{/*           alt="logo" */}
+{/*         /> */}
+{/*         <Box fontSize="2xl" fontWeight="bold"> */}
+{/*           <Link href="/">Realtor</Link> */}
+{/*         </Box> */}
+{/*       </Flex> */}
+
+      <Spacer />
+
+      {/* RIGHT ICON BUTTONS */}
+      <HStack spacing={4}>
+
+        {/* Message / Money / Notification / Profile */}
+        {[BsChatDots, BsCurrencyDollar, BsBell, BsPerson].map((Icon, i) => (
+          <Flex
+            key={i}
+            w="42px"
+            h="42px"
+            border="1px solid #ddd"
+            borderRadius="full"
+            align="center"
+            justify="center"
+            cursor="pointer"
+            transition="0.2s"
+            color="white"
+            _hover={{ bg: "gray.50" }}
+          >
+            <Icon size={18} />
+          </Flex>
+        ))}
+
+        {/* File Icon */}
+        <Flex
+          w="42px"
+          h="42px"
+          border="1px solid #ddd"
+          borderRadius="full"
+          align="center"
+          justify="center"
+          cursor="pointer"
+          transition="0.2s"
+          color="white"
+          _hover={{ bg: "gray.50" }}
+        >
+          <BsFileEarmarkText size={18} />
+        </Flex>
+
+        <Box
+          h="28px"
+          borderRight="2px solid rgba(255,255,255,0.6)"
+          mx="6"
+        />
+
+        {/* SIGN OUT BUTTON */}
+        <Flex
+          w="42px"
+          h="42px"
+          border="1px solid #ddd"
+          borderRadius="full"
+          align="center"
+          justify="center"
+          cursor="pointer"
+          onClick={handleLogout}
+          transition="0.2s"
+          color="white"
+          _hover={{ bg: "red.50", color:"red.500", borderColor:"red.300" }}
+          title="Sign Out"
+        >
+          <FiLogOut size={18} />
+        </Flex>
+
+      </HStack>
+    </Flex>
+  );
+}

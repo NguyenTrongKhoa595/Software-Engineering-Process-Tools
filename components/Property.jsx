@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Box, Flex, Text } from '@chakra-ui/layout';
+import { Box, Flex, Text, Badge } from '@chakra-ui/layout';
 import { Avatar } from '@chakra-ui/avatar';
 import { FaBed, FaBath } from 'react-icons/fa';
 import { BsGridFill } from 'react-icons/bs';
@@ -19,60 +19,87 @@ const Property = ({ property }) => {
     baths,
     area,
     agency,
-    isVerified
+    isVerified,
   } = property;
 
   return (
     <Link href={`/property/${id}`} passHref>
       <Flex
-        flexWrap="wrap"
-        w="420px"
-        p="5"
-        paddingTop="0px"
-        justifyContent="flex-start"
+        direction="column"
+        w="340px"
+        bg="white"
+        borderRadius="12px"
+        overflow="hidden"
+        boxShadow="0 4px 15px rgba(0,0,0,0.08)"
+        _hover={{ transform: "scale(1.02)", boxShadow:"0 6px 18px rgba(0,0,0,0.12)" }}
+        transition="0.25s"
         cursor="pointer"
       >
+
+        {/* Image */}
         <Box>
           <Image
             src={coverPhoto?.url || DefaultImage}
             width={400}
             height={260}
             alt="property"
-            unoptimized={true}
+            unoptimized
+            style={{
+              objectFit: "cover",
+              width: "100%",
+              height: "220px",
+            }}
           />
         </Box>
 
-        <Box w="full">
-          <Flex paddingTop="2" alignItems="center" justifyContent="space-between">
-            <Flex alignItems="center">
-              <Box paddingRight="3" color="green.400">
-                {isVerified && <GoVerified />}
-              </Box>
-              <Text fontWeight="bold" fontSize="lg">
-                AED {price}
-                {rentFrequency ? `/${rentFrequency}` : ''}
+        {/* Content */}
+        <Flex direction="column" p="4" gap="6px">
+
+          {/* Price + Agency + Verified */}
+          <Flex justify="space-between" align="center">
+            <Flex align="center" gap="6px">
+              {isVerified && <GoVerified color="green" />}
+              <Text fontSize="xl" fontWeight="bold">
+                AED {millify(price)}
+                <Text as="span" fontSize="sm" color="gray.500">
+                  {rentFrequency ? ` /${rentFrequency}` : ''}
+                </Text>
               </Text>
             </Flex>
 
-            <Box>
-              <Avatar size="sm" src={agency?.logo?.url || ''} />
-            </Box>
+            <Avatar size="sm" src={agency?.logo?.url || ''} />
           </Flex>
 
+          {/* Info Row */}
           <Flex
-            alignItems="center"
-            p="1"
-            justifyContent="space-between"
-            w="250px"
-            color="blue.400"
+            align="center"
+            justify="space-between"
+            fontSize="sm"
+            fontWeight="medium"
+            color="gray.600"
+            mt="2"
           >
-            {rooms} <FaBed /> | {baths} <FaBath /> | {millify(area)} sqft <BsGridFill />
+            <Flex align="center" gap="5px">
+              <FaBed /> {rooms}
+            </Flex>
+            <Flex align="center" gap="5px">
+              <FaBath /> {baths}
+            </Flex>
+            <Flex align="center" gap="5px">
+              <BsGridFill /> {millify(area)} sqft
+            </Flex>
           </Flex>
 
-          <Text fontSize="lg">
-            {title.length > 30 ? title.substring(0, 30) + '...' : title}
+          {/* Title */}
+          <Text
+            fontSize="md"
+            fontWeight="semibold"
+            color="gray.800"
+            mt="2"
+          >
+            {title.length > 45 ? title.substring(0, 45) + "..." : title}
           </Text>
-        </Box>
+        </Flex>
       </Flex>
     </Link>
   );

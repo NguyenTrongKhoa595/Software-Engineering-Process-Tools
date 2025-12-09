@@ -12,7 +12,7 @@ export default function Layout({ children }) {
   const hideNavbarRoutes = [
     '/login',
     '/register',
-    '/message',
+    '/messages',
     '/forgot-password'
   ];
 

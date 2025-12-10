@@ -145,7 +145,11 @@ export default function PaymentPage() {
             <div className="lg:w-1/2">
               <div className="bg-white rounded-xl shadow-lg p-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Make Payment</h2>
-                <p className="text-gray-600 mb-6">Please enter complete information for payment to be made</p>
+                
+                <p className="text-gray-600 mb-6 flex items-center">
+                  <i data-feather="alert-octagon" className="w-5 h-5 text-yellow-500 mr-2"></i>
+                  Please enter complete information for payment to be made
+                </p>
 
                 {/* Inline message */}
                 {message && (

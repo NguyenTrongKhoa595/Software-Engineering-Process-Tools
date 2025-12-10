@@ -120,10 +120,10 @@ export default function LandlordDashboard() {
                 </Box>
             </Flex>
             ))}
-            {/* See Invoice Button */}
+            {/* View All Button */}
             <Flex justify="flex-end" mt="4">
             <Button size="sm" colorScheme="blue" variant="outline">
-                See Invoice
+                View All
             </Button>
             </Flex>
         </Box>

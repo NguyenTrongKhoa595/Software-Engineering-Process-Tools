@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }) {
     NProgress.configure({ showSpinner: false });
 
     const handleStart = () => NProgress.start();
-    const handleStop = () => NProgress.done();
+    const handleStop = () => NProgress.done();  
 
     Router.events.on('routeChangeStart', handleStart);
     Router.events.on('routeChangeComplete', handleStop);

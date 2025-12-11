@@ -270,6 +270,7 @@ export default function ProfilePage() {
                             leftIcon={<FiFileText />}
                             variant="outline"
                             colorScheme="blue"
+                            onClick={() => router.push(`/profile/${id}/documents`)}
                         >
                             Personal Documents
                         </Button>

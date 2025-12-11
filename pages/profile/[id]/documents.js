@@ -13,7 +13,6 @@ import {
   Image,
   IconButton,
   Spinner,
-  Heading,
 } from "@chakra-ui/react";
 import {
   FiUploadCloud,
@@ -22,6 +21,7 @@ import {
   FiTrash2,
   FiShare2,
 } from "react-icons/fi";
+import HeaderLogo from "../../../components/HeaderLogo";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
@@ -407,20 +407,7 @@ export default function PersonalDocumentsPage() {
 
   return (
     <Flex direction="column" minH="100vh" bg="gray.50">
-      {/* top logo row */}
-      <Box py={6}>
-        <HStack justify="center" spacing={3}>
-          <Box
-            w="40px"
-            h="40px"
-            borderRadius="full"
-            bgGradient="linear(to-tr, pink.400, purple.500, orange.400)"
-          />
-          <Heading size="md" fontWeight="semibold">
-            RentMate
-          </Heading>
-        </HStack>
-      </Box>
+      <HeaderLogo />
 
       {/* main card */}
       <Flex

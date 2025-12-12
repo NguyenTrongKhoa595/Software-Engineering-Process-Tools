@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Flex, Box, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-
+import { SimpleGrid } from '@chakra-ui/react';
 import headerImg from '../assets/images/Header.png';
 
 import Property from '../components/Property';
@@ -13,9 +13,9 @@ import { mockProperties } from '../utils/mockProperties';
 // ---------------- Home Page ----------------
 const Home = () => {
   const router = useRouter();
-  const { availabilityExternalIDs,
-          categoryExternalID,
-          locationExternalIDs,
+  const { availability,
+          category,
+          location,
           minPrice,
           maxPrice,
         } = router.query;
@@ -23,18 +23,18 @@ const Home = () => {
   // 🔍 Filter logic
   const filteredProperties = mockProperties.filter((p) => {
     // --- Availability filter ---
-    if (availabilityExternalIDs && availabilityExternalIDs !== '') {
-      if (p.availabilityExternalIDs !== availabilityExternalIDs) return false;
+    if (availability && availability !== '') {
+      if (p.availability !== availability) return false;
     }
 
     // --- Category filter ---
-    if (categoryExternalID && categoryExternalID !== '') {
-      if (p.categoryExternalID !== categoryExternalID) return false;
+    if (category && category !== '') {
+      if (p.category !== category) return false;
     }
 
     // --- Location filter ---
-    if (locationExternalIDs && locationExternalIDs !== '') {
-      if (p.locationExternalIDs !== locationExternalIDs) return false;
+    if (location && location !== '') {
+      if (p.location !== location) return false;
     }
 
     // --- Price filter (convert string → number) ---
@@ -69,15 +69,19 @@ const Home = () => {
       </Box>
 
       {/* Property Grid */}
-      <Flex flexWrap="wrap" justifyContent="center" mt="10">
-        {filteredProperties.map((property) => (
-          <Property property={property} key={property.id} />
-        ))}
-
-        {filteredProperties.length === 0 && (
-          <Box mt="10" fontSize="24px">No properties found.</Box>
+      <Box mt="10" px="6">
+        {filteredProperties.length > 0 ? (
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8" justifyItems="center" mt="10">
+            {filteredProperties.map((property) => (
+              <Property key={property.id} property={property} />
+            ))}
+          </SimpleGrid>
+        ) : (
+          <Box mt="10" fontSize="24px" textAlign="center">
+            No properties found.
+          </Box>
         )}
-      </Flex>
+      </Box>
     </Box>
   );
 };

@@ -47,7 +47,7 @@ export const filterData = [
       { name: 'Residential Building', value: 'Residential Building' },
     ],
     placeholder: 'Property Type',
-    queryName: 'categoryExternalID',
+    queryName: 'category',
   },
   {
     items: [
@@ -61,26 +61,26 @@ export const filterData = [
       { name: 'Deira', value: 'Deira' },
     ],
     placeholder: 'Location',
-    queryName: 'locationExternalIDs',
+    queryName: 'location',
   },
   {
     items: [
-      { name: 'Available Now', value: 'now' },
+      { name: 'Available Now', value: 'available' },
       { name: 'Unavailable', value: 'unavailable' },
     ],
     placeholder: 'Availability',
-    queryName: 'availabilityExternalIDs',
+    queryName: 'availability',
   },
 ];
 
 export const getFilterValues = (filterValues) => {
-  const { minPrice, maxPrice, categoryExternalID, locationExternalIDs, availabilityExternalIDs } = filterValues;
+  const { minPrice, maxPrice, category, location, availability } = filterValues;
 
   return [
     { name: 'minPrice', value: minPrice },
     { name: 'maxPrice', value: maxPrice },
-    { name: 'categoryExternalID', value: categoryExternalID },
-    { name: 'locationExternalIDs', value: locationExternalIDs },
-    { name: 'availabilityExternalIDs', value: availabilityExternalIDs },
+    { name: 'category', value: category },
+    { name: 'location', value: location },
+    { name: 'availability', value: availability },
   ];
 };

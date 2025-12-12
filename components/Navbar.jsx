@@ -28,12 +28,10 @@ const Navbar = () => {
       top="0"
       zIndex="1000"
     >
-      {/* Logo hidden on Employees page per request */}
-      {pathname !== '/employees' && (
-        <Box fontSize="2xl" fontWeight="bold" color="blue.500">
-          <Link href="/">RentMate</Link>
-        </Box>
-      )}
+      {/* Logo */}
+      <Box fontSize="2xl" fontWeight="bold" color="blue.500">
+        <Link href="/">RentMate</Link>
+      </Box>
 
       <Spacer />
 

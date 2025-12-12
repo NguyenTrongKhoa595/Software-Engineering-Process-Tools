@@ -63,7 +63,7 @@ export default function LandlordDashboard() {
             </Text>
             </Flex>
 
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6">
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6" justifyItems="center">
             {mockProperties.map((property) => (
                 <Property key={property.id} property={property} />
             ))}

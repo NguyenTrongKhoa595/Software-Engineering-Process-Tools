@@ -220,43 +220,57 @@ export default function LandlordCreate() {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                    <label htmlFor="bedrooms" className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                    <i data-feather="home"></i>
+                    Bedrooms
+                    </label>
                     <input type="number" id="bedrooms" name="bedrooms" min="1" onChange={() => setErrors(prev => ({ ...prev, bedrooms: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Number of bedrooms" />
                     {errors.bedrooms && <p className="mt-1 text-xs text-red-600">{errors.bedrooms}</p>}
                   </div>
                   <div>
-                    <label htmlFor="bathrooms" className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                    <label for="bathrooms" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                                <i data-feather="droplet"></i> Bathrooms
+                    </label>
                     <input type="number" id="bathrooms" name="bathrooms" min="1" step="0.5" onChange={() => setErrors(prev => ({ ...prev, bathrooms: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Number of bathrooms" />
                     {errors.bathrooms && <p className="mt-1 text-xs text-red-600">{errors.bathrooms}</p>}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">Area (sq ft)</label>
+                  <label for="area" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            <i data-feather="maximize-2"></i> Area (sq ft)
+                  </label>
                   <input type="number" id="area" name="area" onChange={() => setErrors(prev => ({ ...prev, area: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   {errors.area && <p className="mt-1 text-xs text-red-600">{errors.area}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="garage" className="block text-sm font-medium text-gray-700 mb-1">Garage</label>
+                  <label htmlFor="garage" className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                    <i data-feather="truck"></i>Garage</label>
                   <input type="number" id="garage" name="garage" min="0" onChange={() => setErrors(prev => ({ ...prev, garage: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Number of garage spaces" />
                   {errors.garage && <p className="mt-1 text-xs text-red-600">{errors.garage}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="yearBuilt" className="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                  <label for="yearBuilt" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            <i data-feather="calendar"></i> Year Built
+                  </label>
                   <input type="number" id="yearBuilt" name="yearBuilt" min="1800" max={new Date().getFullYear()} onChange={() => setErrors(prev => ({ ...prev, yearBuilt: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Construction year" />
                   {errors.yearBuilt && <p className="mt-1 text-xs text-red-600">{errors.yearBuilt}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
+                  <label for="address" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            <i data-feather="map-pin"></i> Full Address
+                  </label>
                   <textarea id="address" name="address" rows="2" onChange={() => setErrors(prev => ({ ...prev, address: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                   {errors.address && <p className="mt-1 text-xs text-red-600">{errors.address}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Price per Month ($)</label>
+                  <label for="price" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                            <i data-feather="dollar-sign"></i> Price per Month
+                        </label>
                   <input type="number" id="price" name="price" onChange={() => setErrors(prev => ({ ...prev, price: undefined }))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   {errors.price && <p className="mt-1 text-xs text-red-600">{errors.price}</p>}
                 </div>

@@ -20,6 +20,7 @@ export default function MaintenanceSubmitPage() {
   const [preferredTime, setPreferredTime] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState(null);
+  const [priority, setPriority] = useState("Medium");
   const toast = useToast();
 
   const handleFileSelect = (e) => {
@@ -30,7 +31,7 @@ export default function MaintenanceSubmitPage() {
   const handleSubmit = () => {
     toast({
       title: "Request submitted",
-      description: "Your maintenance request has been sent.",
+      description: `Your maintenance request has been sent. Priority: ${priority}`,
       status: "success",
     });
   };
@@ -97,6 +98,27 @@ export default function MaintenanceSubmitPage() {
                 rounded="md"
                 minH="180px"
               />
+            </Box>
+
+            <Box w="100%">
+              <Text fontSize="sm" mb={1} color="gray.600">Priority</Text>
+              <HStack>
+                {[
+                  { label: "Low", value: "Low" },
+                  { label: "Medium", value: "Medium" },
+                  { label: "High", value: "High" },
+                ].map((opt) => (
+                  <Button
+                    key={opt.value}
+                    size="sm"
+                    variant={priority === opt.value ? "solid" : "outline"}
+                    colorScheme={priority === opt.value ? "blue" : "gray"}
+                    onClick={() => setPriority(opt.value)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </HStack>
             </Box>
 
             {/* Upload Box */}

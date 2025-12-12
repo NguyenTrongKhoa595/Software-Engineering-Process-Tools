@@ -1,9 +1,21 @@
 import Link from 'next/link';
 import { IconButton, Flex, Box, Spacer, HStack } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import { FaUserCircle } from 'react-icons/fa';
 import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
+  const router = useRouter();
+  const { pathname } = router;
+  // Determine user role from localStorage (fallback to LANDLORD)
+  let userRole = 'LANDLORD';
+  if (typeof window !== 'undefined') {
+    const stored = window.localStorage.getItem('role');
+    if (stored) userRole = stored;
+  }
+
+  const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
+  const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
   return (
     <Flex
       px="6"
@@ -16,16 +28,18 @@ const Navbar = () => {
       top="0"
       zIndex="1000"
     >
-      {/* Logo */}
-      <Box fontSize="2xl" fontWeight="bold" color="blue.500">
-        <Link href="/">RentMate</Link>
-      </Box>
+      {/* Logo hidden on Employees page per request */}
+      {pathname !== '/employees' && (
+        <Box fontSize="2xl" fontWeight="bold" color="blue.500">
+          <Link href="/">RentMate</Link>
+        </Box>
+      )}
 
       <Spacer />
 
       {/* Center Menu Items */}
       <HStack spacing="8" fontSize="lg" fontWeight="medium">
-        {["Documents", "Communication", "Payments", "Requests"].map((label) => (
+        {tabs.map((label) => (
         <Link href={`/${label.toLowerCase()}`} key={label} passHref>
           <Box
             position="relative"

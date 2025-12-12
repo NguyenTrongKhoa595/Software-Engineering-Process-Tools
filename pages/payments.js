@@ -31,7 +31,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FiTrash2, FiEdit2 } from "react-icons/fi";
-import HeaderLogo from "../components/HeaderLogo";
+// Removed HeaderLogo per request
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api";
@@ -202,18 +202,6 @@ export default function PaymentsPage() {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      {/* Header */}
-      <Flex
-        bg="white"
-        px={8}
-        py={6}
-        borderBottom="1px"
-        borderColor="gray.200"
-        align="center"
-        justify="space-between"
-      >
-        <HeaderLogo />
-      </Flex>
 
       {/* Main Content */}
       <Box maxW="1400px" mx="auto" p={8}>

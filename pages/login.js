@@ -50,7 +50,7 @@ export default function LoginPage() {
             pl={4}
             gap={2}
           >
-            <Input placeholder="Email id" border="none" _focus={{ boxShadow: "none" }} />
+            <Input placeholder="Email " border="none" _focus={{ boxShadow: "none" }} />
           </Flex>
 
           <Flex

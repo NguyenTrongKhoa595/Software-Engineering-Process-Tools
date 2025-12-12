@@ -1,5 +1,6 @@
 // pages/employees.js
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   Box,
   Flex,
@@ -37,6 +38,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/
 
 export default function EmployeesPage() {
   const toast = useToast();
+  const router = useRouter();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -227,7 +229,14 @@ export default function EmployeesPage() {
                   <Tr key={emp.id} _hover={{ bg: "gray.50" }}>
                     <Td>
                       <HStack spacing={3}>
-                        <Avatar size="sm" name={emp.name} bg={emp.avatarColor || "gray.500"} />
+                        <Avatar 
+                          size="sm" 
+                          name={emp.name} 
+                          bg={emp.avatarColor || "gray.500"} 
+                          cursor="pointer"
+                          onClick={() => router.push(`/profile/${emp.id}`)}
+                          _hover={{ opacity: 0.8 }}
+                        />
                         <Box>
                           <Text fontWeight="medium">{emp.name}</Text>
                         </Box>

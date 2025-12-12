@@ -35,6 +35,81 @@ import HeaderLogo from "../../../components/HeaderLogo";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
 
+// Mock documents data for tenant view
+const mockTenantDocuments = [
+  {
+    id: 1,
+    name: "Lease_Agreement_2025.pdf",
+    type: "PDF",
+    createdAt: "2025-01-15T10:30:00Z",
+    ownerName: "Property Manager",
+    lastModifiedRelative: "2 days ago",
+    modifiedAt: "2025-12-11T14:20:00Z",
+    modifiedBy: "Property Manager",
+    sizeBytes: 2457600, // 2.4 MB
+    location: "Property Documents > Leases",
+    sharedWith: [
+      { id: 1, name: "You (Tenant)" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Move_In_Checklist.pdf",
+    type: "PDF",
+    createdAt: "2025-01-20T09:15:00Z",
+    ownerName: "Property Manager",
+    lastModifiedRelative: "1 month ago",
+    modifiedAt: "2025-11-13T11:45:00Z",
+    modifiedBy: "Property Manager",
+    sizeBytes: 512000, // 500 KB
+    location: "Property Documents > Checklists",
+    sharedWith: []
+  },
+  {
+    id: 3,
+    name: "House_Rules.pdf",
+    type: "PDF",
+    createdAt: "2025-01-15T08:00:00Z",
+    ownerName: "Landlord",
+    lastModifiedRelative: "1 month ago",
+    modifiedAt: "2025-11-15T16:30:00Z",
+    modifiedBy: "Landlord",
+    sizeBytes: 358400, // 350 KB
+    location: "Property Documents > Rules",
+    sharedWith: [
+      { id: 1, name: "All Tenants" }
+    ]
+  },
+  {
+    id: 4,
+    name: "Parking_Pass.pdf",
+    type: "PDF",
+    createdAt: "2025-02-01T13:20:00Z",
+    ownerName: "Property Manager",
+    lastModifiedRelative: "2 weeks ago",
+    modifiedAt: "2025-11-29T10:15:00Z",
+    modifiedBy: "Property Manager",
+    sizeBytes: 204800, // 200 KB
+    location: "Property Documents > Passes",
+    sharedWith: []
+  },
+  {
+    id: 5,
+    name: "Property_Floor_Plan.png",
+    type: "Image",
+    createdAt: "2025-01-10T15:45:00Z",
+    ownerName: "Landlord",
+    lastModifiedRelative: "2 months ago",
+    modifiedAt: "2025-10-10T09:00:00Z",
+    modifiedBy: "Landlord",
+    sizeBytes: 2097152, // 2 MB
+    location: "Property Documents > Plans",
+    sharedWith: [
+      { id: 1, name: "You (Tenant)" }
+    ]
+  }
+];
+
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
@@ -73,13 +148,18 @@ export default function TenantPropertyDocumentsPage() {
     const fetchDocs = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `${API_BASE}/properties/${propertyId}/documents`
-        );
-        if (!res.ok) throw new Error("Failed to load documents");
-        const data = await res.json();
-        setDocs(data);
-        if (data.length > 0) setSelectedDoc(data[0]);
+        // Use mock data for testing
+        setDocs(mockTenantDocuments);
+        if (mockTenantDocuments.length > 0) setSelectedDoc(mockTenantDocuments[0]);
+        
+        // Uncomment to use real API
+        // const res = await fetch(
+        //   `${API_BASE}/properties/${propertyId}/documents`
+        // );
+        // if (!res.ok) throw new Error("Failed to load documents");
+        // const data = await res.json();
+        // setDocs(data);
+        // if (data.length > 0) setSelectedDoc(data[0]);
       } catch (e) {
         console.error(e);
         toast({

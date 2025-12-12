@@ -122,10 +122,7 @@ export default function Navbar() {
           transition="0.2s"
           color="white"
           _hover={{ bg: "gray.50" }}
-          onClick={() => {
-            const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
-            if (userId) router.push(`/profile/${userId}/documents`);
-          }}
+          onClick={() => router.push('/property/select?returnTo=documents-tenant')}
         >
           <BsFileEarmarkText size={18} />
         </Flex>

@@ -1,5 +1,6 @@
 import { Box, SimpleGrid, Flex, Text, Button } from "@chakra-ui/react";
 import { FaHome, FaUsers, FaTools, FaDollarSign } from "react-icons/fa";
+import { useRouter } from "next/router";
 import Property from "../../components/Property";
 import { mockProperties } from "../../utils/mockProperties";
 
@@ -11,6 +12,8 @@ const dashboardStats = [
 ];
 
 export default function LandlordDashboard() {
+  const router = useRouter();
+  
   return (
     <>
         <Box p="6">
@@ -58,6 +61,7 @@ export default function LandlordDashboard() {
                 fontWeight="medium"
                 cursor="pointer"
                 _hover={{ textDecoration: "underline" }}
+                onClick={() => router.push('/properties')}
             >
                 View All &gt;
             </Text>
@@ -122,7 +126,7 @@ export default function LandlordDashboard() {
             ))}
             {/* View All Button */}
             <Flex justify="flex-end" mt="4">
-            <Button size="sm" colorScheme="blue" variant="outline">
+            <Button size="sm" colorScheme="blue" variant="outline" onClick={() => router.push('/payments')}>
                 View All
             </Button>
             </Flex>
@@ -184,7 +188,7 @@ export default function LandlordDashboard() {
 
             {/* Optional button to view all requests */}
             <Flex justify="flex-end" mt="4">
-                <Button size="sm" colorScheme="blue" variant="outline">
+                <Button size="sm" colorScheme="blue" variant="outline" onClick={() => router.push('/requests')}>
                 View All
                 </Button>
             </Flex>

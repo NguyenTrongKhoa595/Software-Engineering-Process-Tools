@@ -11,6 +11,7 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
+  Image,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
@@ -33,16 +34,16 @@ export default function SignupPage() {
         boxShadow="0 8px 32px rgba(0, 0, 0, 0.08)"
       >
         {/* Logo */}
-        <Flex justify="center" mb={8}>
-          <Icon viewBox="0 0 30 33" boxSize={10}>
-            <circle cx="15" cy="15" r="15" fill="url(#paint0_radial)" />
-            <defs>
-              <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#ff8c00" />
-                <stop offset="1" stopColor="#bf00ff" />
-              </radialGradient>
-            </defs>
-          </Icon>
+        <Flex justify="center" mb={6} direction="column" align="center">
+          <Image
+            src="/assets/images/RentMate_logo.png"
+            alt="RentMate logo"
+            maxW="120px"
+            objectFit="contain"
+          />
+          <Text fontSize="xl" fontWeight="bold" color="teal.600" mt={2}>
+            RentMate
+          </Text>
         </Flex>
 
         {/* Title */}

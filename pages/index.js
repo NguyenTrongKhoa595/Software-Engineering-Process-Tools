@@ -1,14 +1,17 @@
 import Image from 'next/image';
 import { Flex, Box, Text, Button, SlideFade } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 import Property from '../components/Property';
 import SearchFilters from '../components/SearchFilters';
 import { mockProperties } from '../utils/mockProperties';
+import NavbarGuest from '../components/NavbarGuest';
 import NavbarTenant from '../components/NavbarTenant';
-//import Navbar from '../components/NavbarLLPM';
+import NavbarLLPM from '../components/NavbarLLPM';
 // ---------------- Home Page ----------------
 const Home = () => {
   const router = useRouter();
+  const [userRole, setUserRole] = useState(null);
   const {
     availabilityExternalIDs,
     categoryExternalID,
@@ -16,6 +19,12 @@ const Home = () => {
     minPrice,
     maxPrice,
   } = router.query;
+
+  // Get user role from localStorage
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    setUserRole(role);
+  }, []);
 
   // 🔍 Filter logic -----------------------------------------
   const filteredProperties = mockProperties.filter((p) => {
@@ -31,9 +40,20 @@ const Home = () => {
     return true;
   });
 
+  // Render navbar based on user role
+  const renderNavbar = () => {
+    if (userRole === 'LANDLORD' || userRole === 'PROPERTY_MANAGER') {
+      return <NavbarLLPM />;
+    } else if (userRole === 'TENANT') {
+      return <NavbarTenant />;
+    } else {
+      return <NavbarGuest />;
+    }
+  };
+
   return (
     <Box>
-      <NavbarTenant />
+      {renderNavbar()}
 
       {/* ================= Hero Section ================= */}
       <Box
@@ -145,17 +165,19 @@ const Home = () => {
 
 
       {/* ================= CTA Section ================= */}
-      <Box textAlign="center" py="70px" mt="20" bg="gray.50">
-        <Text fontSize="32px" fontWeight="bold" mb={3}>
-          Ready To Move Into Your Dream House?
-        </Text>
-        <Text fontSize="18px" color="gray.600" mb={6}>
-          Browse thousands of listings updated daily.
-        </Text>
-        <Button size="lg" colorScheme="teal">
-          Get Started
-        </Button>
-      </Box>
+      {!userRole && (
+        <Box textAlign="center" py="70px" mt="20" bg="gray.50">
+          <Text fontSize="32px" fontWeight="bold" mb={3}>
+            Ready To Move Into Your Dream House?
+          </Text>
+          <Text fontSize="18px" color="gray.600" mb={6}>
+            Browse thousands of listings updated daily.
+          </Text>
+          <Button size="lg" colorScheme="teal" onClick={() => router.push('/signup')}>
+            Get Started
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

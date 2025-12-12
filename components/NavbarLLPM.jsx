@@ -4,18 +4,30 @@ import { useRouter } from 'next/router';
 import { FaUserCircle } from 'react-icons/fa';
 import NotificationDropdown from './NotificationDropdown';
 
-const Navbar = () => {
+const NavbarLLPM = () => {
   const router = useRouter();
   const { pathname } = router;
   // Determine user role from localStorage (fallback to LANDLORD)
   let userRole = 'LANDLORD';
+  let userId = null;
   if (typeof window !== 'undefined') {
     const stored = window.localStorage.getItem('role');
     if (stored) userRole = stored;
+    userId = window.localStorage.getItem('userId');
   }
  
   const baseTabs = ["Properties", "Documents", "Messages", "Payments", "Requests"];
   const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
+  
+  // Map tab names to their actual routes
+  const pathMap = {
+    'Documents': '/property/select?returnTo=documents',
+  };
+
+  const getTabPath = (label) => {
+    return pathMap[label] || `/${label.toLowerCase()}`;
+  };
+
   return (
     <Flex
       px="6"
@@ -38,7 +50,7 @@ const Navbar = () => {
       {/* Center Menu Items */}
       <HStack spacing="8" fontSize="lg" fontWeight="medium">
         {tabs.map((label) => (
-        <Link href={`/${label.toLowerCase()}`} key={label} passHref>
+        <Link href={getTabPath(label)} key={label} passHref>
           <Box
             position="relative"
             pb="1"
@@ -74,10 +86,12 @@ const Navbar = () => {
           aria-label="profile"
           icon={<FaUserCircle size={28} />}
           variant="ghost"
+          onClick={() => router.push(`/profile/${userId}`)}
+          cursor="pointer"
         />
       </HStack>
     </Flex>
   );
 };
  
-export default Navbar;
+export default NavbarLLPM;

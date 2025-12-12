@@ -11,10 +11,10 @@ import {
   HStack,
   Tag,
   TagLabel,
-  Heading,
   Spinner,
   Divider,
 } from "@chakra-ui/react";
+import HeaderLogo from "../../../components/HeaderLogo";
 
 const ROLE_LABELS = {
   LANDLORD: "Landlord",
@@ -68,17 +68,7 @@ export default function PublicProfileView() {
 
   return (
     <Flex direction="column" minH="100vh" bg="gray.50">
-      <Box py={6}>
-        <HStack justify="center" spacing={3}>
-          <Box
-            w="40px"
-            h="40px"
-            borderRadius="full"
-            bgGradient="linear(to-tr, pink.400, purple.500, orange.400)"
-          />
-          <Heading size="md">RentMate</Heading>
-        </HStack>
-      </Box>
+      <HeaderLogo />
 
       <Flex
         flex="1"

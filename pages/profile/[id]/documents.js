@@ -13,7 +13,6 @@ import {
   Image,
   IconButton,
   Spinner,
-  Heading,
 } from "@chakra-ui/react";
 import {
   FiUploadCloud,
@@ -22,6 +21,7 @@ import {
   FiTrash2,
   FiShare2,
 } from "react-icons/fi";
+import HeaderLogo from "../../../components/HeaderLogo";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
@@ -59,7 +59,7 @@ function isImageFile(fileName = "") {
 
 function UploadCard({
   slot,
-  document,
+  uploadedFile,
   onSelectFile,
   onView,
   onDownload,
@@ -118,7 +118,7 @@ function UploadCard({
         }}
         onDrop={handleDrop}
       >
-        {!document ? (
+        {!uploadedFile ? (
           <VStack spacing={3}>
             <FiUploadCloud size={32} color="#3182CE" />
             <Text fontSize="sm" color="gray.600">
@@ -130,7 +130,7 @@ function UploadCard({
             <Button
               size="sm"
               colorScheme="blue"
-              onClick={() => document.getElementById(fileInputId)?.click()}
+              onClick={() => typeof document !== 'undefined' && document.getElementById(fileInputId)?.click()}
             >
               Select file
             </Button>
@@ -144,10 +144,10 @@ function UploadCard({
           </VStack>
         ) : (
           <VStack spacing={2}>
-            {isImageFile(document.fileName) ? (
+            {isImageFile(uploadedFile.fileName) ? (
               <Image
-                src={document.previewUrl}
-                alt={document.fileName}
+                src={uploadedFile.previewUrl}
+                alt={uploadedFile.fileName}
                 maxH="120px"
                 maxW="160px"
                 objectFit="cover"
@@ -170,7 +170,7 @@ function UploadCard({
                   </Text>
                 </Box>
                 <Text fontSize="xs" noOfLines={1} maxW="140px">
-                  {document.fileName}
+                  {uploadedFile.fileName}
                 </Text>
               </VStack>
             )}
@@ -178,7 +178,7 @@ function UploadCard({
         )}
       </Box>
 
-      {document && (
+      {uploadedFile && (
         <HStack spacing={4} justify="center" pt={1}>
           <IconButton
             aria-label="Download"
@@ -289,7 +289,27 @@ export default function PersonalDocumentsPage() {
   }, [fetchDocuments]);
 
   const uploadForSlot = async (slot, file) => {
-    if (!id) return;
+    if (!id || !file) return;
+
+    // Validate file type - only PDF or images
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        status: "error",
+        title: "Invalid file type",
+        description:
+          "Only PDF and image files are allowed (PNG, JPG, GIF, WebP)",
+      });
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("documentType", slot.backendType);
@@ -407,20 +427,7 @@ export default function PersonalDocumentsPage() {
 
   return (
     <Flex direction="column" minH="100vh" bg="gray.50">
-      {/* top logo row */}
-      <Box py={6}>
-        <HStack justify="center" spacing={3}>
-          <Box
-            w="40px"
-            h="40px"
-            borderRadius="full"
-            bgGradient="linear(to-tr, pink.400, purple.500, orange.400)"
-          />
-          <Heading size="md" fontWeight="semibold">
-            RentMate
-          </Heading>
-        </HStack>
-      </Box>
+      <HeaderLogo />
 
       {/* main card */}
       <Flex
@@ -447,7 +454,7 @@ export default function PersonalDocumentsPage() {
             <UploadCard
               key={slot.key}
               slot={slot}
-              document={docsBySlot[slot.key]}
+              uploadedFile={docsBySlot[slot.key]}
               onSelectFile={(file) => uploadForSlot(slot, file)}
               onView={() => viewDocument(slot.key)}
               onDownload={() => downloadDocument(slot.key)}

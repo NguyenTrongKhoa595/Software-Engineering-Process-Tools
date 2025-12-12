@@ -15,6 +15,17 @@ import {
 } from "@chakra-ui/react";
 import { FiMapPin } from "react-icons/fi";
 // Removed HeaderLogo per request
+import { fetchApi } from "../utils/fetchApi";
+
+export async function getServerSideProps() {
+  const data = await fetchApi("/properties");
+
+  return {
+    props: {
+      properties: data,
+    },
+  };
+}
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api";

@@ -1,16 +1,47 @@
+// pages/login.js
 import { Box, Flex, Image, Input, Button, Text, Checkbox } from "@chakra-ui/react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { apiClient } from "../utils/apiClient";
 
 export default function LoginPage() {
-
   const router = useRouter();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const result = await apiClient("http://localhost:8081/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      console.log("LOGIN SUCCESS:", result);
+
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+      }
+
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Invalid email or password");
+      setLoading(false);
+    }
+  };
+
   return (
-    <Flex h="100vh" w="100%" >
+    <Flex h="100vh" w="100%">
       {/* LEFT IMAGE */}
       <Box w="50%" display={{ base: "none", md: "block" }}>
         <Image
-          src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVhbCUyMGVzdGF0ZXxlbnwwfHwwfHx8MA%3D%3D"
+          src="https://images.unsplash.com/photo-1582407947304-fd86f028f716"
           alt="login"
           h="100%"
           w="100%"
@@ -18,27 +49,18 @@ export default function LoginPage() {
         />
       </Box>
 
-      {/* RIGHT SIDE LOGIN */}
+      {/* RIGHT LOGIN SIDE */}
       <Flex w={{ base: "100%", md: "50%" }} align="center" justify="center">
         <Box w={{ base: "80%", md: "350px" }} textAlign="center">
-          <Text fontSize="4xl" fontWeight="medium" color="gray.800">
+          <Text fontSize="4xl" fontWeight="medium">
             Sign in
           </Text>
-          <Text fontSize="sm" color="gray.500" mt={3}>
-            Welcome back! Please sign in to continue
-          </Text>
 
-          <Button w="100%" mt={8} bg="gray.100" h="50px" borderRadius="full">
-            <Image src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleLogo.svg" />
-          </Button>
-
-          <Flex align="center" gap={3} w="100%" my={5}>
-            <Box flex="1" h="1px" bg="gray.300" />
-            <Text fontSize="sm" color="gray.500" whiteSpace="nowrap">
-              or sign in with email
+          {errorMessage && (
+            <Text color="red.400" mt={4}>
+              {errorMessage}
             </Text>
-            <Box flex="1" h="1px" bg="gray.300" />
-          </Flex>
+          )}
 
           <Flex
             align="center"
@@ -48,9 +70,15 @@ export default function LoginPage() {
             h="50px"
             borderRadius="full"
             pl={4}
-            gap={2}
+            mt={5}
           >
-            <Input placeholder="Email id" border="none" _focus={{ boxShadow: "none" }} />
+            <Input
+              placeholder="Email"
+              border="none"
+              _focus={{ boxShadow: "none" }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Flex>
 
           <Flex
@@ -62,14 +90,25 @@ export default function LoginPage() {
             h="50px"
             borderRadius="full"
             pl={4}
-            gap={2}
           >
-            <Input type="password" placeholder="Password" border="none" _focus={{ boxShadow: "none" }} />
+            <Input
+              type="password"
+              placeholder="Password"
+              border="none"
+              _focus={{ boxShadow: "none" }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </Flex>
 
           <Flex w="100%" justify="space-between" mt={6} color="gray.600" fontSize="sm">
             <Checkbox>Remember me</Checkbox>
-            <Text as="a" textDecoration="underline" cursor="pointer" onClick={() => router.push("/forgot-password")}>
+            <Text
+              as="a"
+              textDecoration="underline"
+              cursor="pointer"
+              onClick={() => router.push("/forgot-password")}
+            >
               Forgot password?
             </Text>
           </Flex>
@@ -82,13 +121,21 @@ export default function LoginPage() {
             color="white"
             bg="blue.500"
             _hover={{ opacity: 0.9 }}
+            onClick={handleLogin}
+            isLoading={loading}
           >
             Login
           </Button>
 
           <Text mt={4} fontSize="sm" color="gray.600">
             Don’t have an account?{" "}
-            <Text as="a" color="blue.400" cursor="pointer" _hover={{ textDecoration: "underline" }} onClick={() => router.push("/signup")} >
+            <Text
+              as="a"
+              color="blue.400"
+              cursor="pointer"
+              _hover={{ textDecoration: "underline" }}
+              onClick={() => router.push("/signup")}
+            >
               Sign up
             </Text>
           </Text>

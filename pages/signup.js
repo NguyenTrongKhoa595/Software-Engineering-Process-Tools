@@ -1,3 +1,4 @@
+// pages/signup.js
 import {
   Box,
   Flex,
@@ -14,10 +15,62 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useState } from "react";
+import { useRouter } from "next/router";
+import { apiClient } from "../utils/apiClient";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSignup = async () => {
+    setErrorMsg("");
+
+    if (password !== confirm) {
+      setErrorMsg("Passwords do not match");
+      return;
+    }
+
+    if (!role) {
+      setErrorMsg("Please select a role");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await apiClient("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          fullname,
+          email,
+          phone,
+          password,
+          role,
+        }),
+      });
+
+      console.log("REGISTER SUCCESS:", result);
+
+      router.push("/login");
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Registration failed: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Flex bg="white" justify="center" align="center" minH="100vh" px={4}>
@@ -37,7 +90,7 @@ export default function SignupPage() {
           <Icon viewBox="0 0 30 33" boxSize={10}>
             <circle cx="15" cy="15" r="15" fill="url(#paint0_radial)" />
             <defs>
-              <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse">
+              <radialGradient id="paint0_radial" cx="0" cy="0" r="1">
                 <stop stopColor="#ff8c00" />
                 <stop offset="1" stopColor="#bf00ff" />
               </radialGradient>
@@ -45,7 +98,6 @@ export default function SignupPage() {
           </Icon>
         </Flex>
 
-        {/* Title */}
         <Text fontSize="2.4xl" fontWeight="semibold" textAlign="center" color="gray.900">
           Create account
         </Text>
@@ -53,21 +105,44 @@ export default function SignupPage() {
           Enter your details to continue
         </Text>
 
-        {/* Fields */}
+        {errorMsg && (
+          <Text color="red.500" mt={5} textAlign="center" fontSize="sm">
+            {errorMsg}
+          </Text>
+        )}
+
         <Box mt={10}>
           <FormControl mt={4}>
             <FormLabel fontSize="sm" color="gray.700">Full name</FormLabel>
-            <Input placeholder="Enter your name" bg="gray.100" focusBorderColor="blue.500" />
+            <Input
+              placeholder="Enter your name"
+              bg="gray.100"
+              focusBorderColor="blue.500"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+            />
           </FormControl>
 
           <FormControl mt={4}>
             <FormLabel fontSize="sm" color="gray.700">Email</FormLabel>
-            <Input placeholder="Enter your email" bg="gray.100" focusBorderColor="blue.500" />
+            <Input
+              placeholder="Enter your email"
+              bg="gray.100"
+              focusBorderColor="blue.500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </FormControl>
 
           <FormControl mt={4}>
             <FormLabel fontSize="sm" color="gray.700">Phone number</FormLabel>
-            <Input placeholder="Enter phone number" bg="gray.100" focusBorderColor="blue.500" />
+            <Input
+              placeholder="Enter phone number"
+              bg="gray.100"
+              focusBorderColor="blue.500"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </FormControl>
 
           <FormControl mt={4}>
@@ -78,6 +153,8 @@ export default function SignupPage() {
                 placeholder="Enter password"
                 bg="gray.100"
                 focusBorderColor="blue.500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <InputRightElement cursor="pointer" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <ViewOffIcon /> : <ViewIcon />}
@@ -93,6 +170,8 @@ export default function SignupPage() {
                 placeholder="Confirm password"
                 bg="gray.100"
                 focusBorderColor="blue.500"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
               />
               <InputRightElement cursor="pointer" onClick={() => setShowConfirm(!showConfirm)}>
                 {showConfirm ? <ViewOffIcon /> : <ViewIcon />}
@@ -102,15 +181,20 @@ export default function SignupPage() {
 
           <FormControl mt={4}>
             <FormLabel fontSize="sm" color="gray.700">Select role</FormLabel>
-            <Select placeholder="Choose role" bg="gray.100" focusBorderColor="blue.500">
-              <option>Tenant</option>
-              <option>Landlord</option>
-              <option>Property Manager</option>
+            <Select
+              placeholder="Choose role"
+              bg="gray.100"
+              focusBorderColor="blue.500"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="Tenant">Tenant</option>
+              <option value="Landlord">Landlord</option>
+              <option value="PropertyManager">Property Manager</option>
             </Select>
           </FormControl>
         </Box>
 
-        {/* Button */}
         <Button
           mt={10}
           py={3}
@@ -120,11 +204,12 @@ export default function SignupPage() {
           borderRadius="md"
           fontSize="md"
           _hover={{ bg: "blue.700" }}
+          isLoading={loading}
+          onClick={handleSignup}
         >
           Sign up
         </Button>
 
-        {/* Footer */}
         <Text textAlign="center" pt={6} color="gray.600">
           Already have an account?{" "}
           <Link href="/login" color="blue.600" fontWeight="medium" _hover={{ textDecoration: "underline" }}>

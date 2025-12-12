@@ -4,7 +4,8 @@ module.exports = {
     domains: [
       'bayut-production.s3.eu-central-1.amazonaws.com',
       'via.placeholder.com' ,  // 👈 add this
-      'www.hellolanding.com', // <--- add this for your new banner
+      'www.hellolanding.com',
+      'images.unsplash.com',// <--- add this for your new banner
     ],
   },
 };

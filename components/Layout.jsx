@@ -3,7 +3,8 @@ import { Box } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 
 import Footer from './Footer';
-import Navbar from './Navbar';
+//import Navbar from './NavbarLLPM';
+import NavbarTenant from './NavbarTenant';
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function Layout({ children }) {
 
       <Box maxWidth='1280px' m='auto'>
         <header>
-          {shouldShowNavbar && <Navbar />}
+          {shouldShowNavbar && <NavbarTenant />}
         </header>
 
         <main>{children}</main>

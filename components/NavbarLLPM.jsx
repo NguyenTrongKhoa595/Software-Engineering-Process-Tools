@@ -3,7 +3,7 @@ import { IconButton, Flex, Box, Spacer, HStack } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { FaUserCircle } from 'react-icons/fa';
 import NotificationDropdown from './NotificationDropdown';
- 
+
 const Navbar = () => {
   const router = useRouter();
   const { pathname } = router;
@@ -14,7 +14,7 @@ const Navbar = () => {
     if (stored) userRole = stored;
   }
  
-  const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
+  const baseTabs = ["Properties", "Documents", "Messages", "Payments", "Requests"];
   const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
   return (
     <Flex

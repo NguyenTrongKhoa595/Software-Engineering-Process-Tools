@@ -1,40 +1,28 @@
 import Image from 'next/image';
 import { Flex, Box, Text, Button, SlideFade } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { SimpleGrid } from '@chakra-ui/react';
-import headerImg from '../assets/images/Header.png';
 import Property from '../components/Property';
 import SearchFilters from '../components/SearchFilters';
 import { mockProperties } from '../utils/mockProperties';
-
+import NavbarTenant from '../components/NavbarTenant';
+//import Navbar from '../components/NavbarLLPM';
 // ---------------- Home Page ----------------
 const Home = () => {
   const router = useRouter();
-  const { availability,
-          category,
-          location,
-          minPrice,
-          maxPrice,
-        } = router.query;
+  const {
+    availabilityExternalIDs,
+    categoryExternalID,
+    locationExternalIDs,
+    minPrice,
+    maxPrice,
+  } = router.query;
 
   // 🔍 Filter logic -----------------------------------------
   const filteredProperties = mockProperties.filter((p) => {
-    // --- Availability filter ---
-    if (availability && availability !== '') {
-      if (p.availability !== availability) return false;
-    }
+    if (availabilityExternalIDs && availabilityExternalIDs !== '' && p.availabilityExternalIDs !== availabilityExternalIDs) return false;
+    if (categoryExternalID && categoryExternalID !== '' && p.categoryExternalID !== categoryExternalID) return false;
+    if (locationExternalIDs && locationExternalIDs !== '' && p.locationExternalIDs !== locationExternalIDs) return false;
 
-    // --- Category filter ---
-    if (category && category !== '') {
-      if (p.category !== category) return false;
-    }
-
-    // --- Location filter ---
-    if (location && location !== '') {
-      if (p.location !== location) return false;
-    }
-
-    // --- Price filter (convert string → number) ---
     const min = minPrice ? Number(minPrice) : null;
     const max = maxPrice ? Number(maxPrice) : null;
 
@@ -45,6 +33,7 @@ const Home = () => {
 
   return (
     <Box>
+      <NavbarTenant />
 
       {/* ================= Hero Section ================= */}
       <Box
@@ -105,22 +94,71 @@ const Home = () => {
         </Box>
       </Box>
 
-      {/* Property Grid */}
-      <Box mt="10" px="6">
-        {filteredProperties.length > 0 ? (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8" justifyItems="center" mt="10">
-            {filteredProperties.map((property) => (
-              <Property key={property.id} property={property} />
-            ))}
-          </SimpleGrid>
-        ) : (
-          <Box mt="10" fontSize="24px" textAlign="center">
+      {/* ================= Property List ================= */}
+      <Box
+        maxW="1400px"
+        mx="auto"
+        px={{ base: 4, md: 10 }}
+        mt="90px"
+      >
+
+        <Box textAlign="center" mb="45px">
+          <Text
+            fontSize={{ base: "28px", md: "38px" }}
+            fontWeight="700"
+            letterSpacing="-0.5px"
+          >
+            Featured Properties
+          </Text>
+          <Box
+            w="70px"
+            h="4px"
+            bg="teal.400"
+            mx="auto"
+            mt="10px"
+            borderRadius="full"
+          />
+          <Text color="gray.600" mt="10px" fontSize="17px">
+            Hand-picked listings curated for quality & lifestyle
+          </Text>
+        </Box>
+
+        {/* New Responsive Grid Layout for Cards */}
+        <Flex
+          wrap="wrap"
+          gap="30px"
+          justify="center"
+          align="stretch"
+        >
+          {filteredProperties.map((property) => (
+            <Property property={property} key={property.id} />
+          ))}
+        </Flex>
+
+        {/* If No Result */}
+        {filteredProperties.length === 0 && (
+          <Box mt="10" fontSize="24px" textAlign="center" color="gray.500">
             No properties found.
           </Box>
         )}
+      </Box>
+
+
+      {/* ================= CTA Section ================= */}
+      <Box textAlign="center" py="70px" mt="20" bg="gray.50">
+        <Text fontSize="32px" fontWeight="bold" mb={3}>
+          Ready To Move Into Your Dream House?
+        </Text>
+        <Text fontSize="18px" color="gray.600" mb={6}>
+          Browse thousands of listings updated daily.
+        </Text>
+        <Button size="lg" colorScheme="teal">
+          Get Started
+        </Button>
       </Box>
     </Box>
   );
 };
 
 export default Home;
+ 

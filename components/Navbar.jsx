@@ -1,33 +1,83 @@
 import Link from 'next/link';
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Flex, Box, Spacer } from '@chakra-ui/react';
-import { FcMenu, FcHome, FcAbout } from 'react-icons/fc';
-import { BsSearch } from 'react-icons/bs';
-import { FiKey } from 'react-icons/fi';
+import { IconButton, Flex, Box, Spacer, HStack } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import { FaUserCircle } from 'react-icons/fa';
+import NotificationDropdown from './NotificationDropdown';
 
-const Navbar = () => (
-  <Flex p='2' borderBottom='1px' borderColor='gray.100'>
-    <Box fontSize='3xl' color='blue.400' fontWeight='bold'>
-      <Link href='/' paddingLeft='2'>Realtor</Link>
-    </Box>
-    <Spacer />
-    <Box>
-      <Menu>
-        <MenuButton as={IconButton} icon={<FcMenu />} variant='outline' color='red.400' />
-        <MenuList>
-          <Link href='/' passHref>
-            <MenuItem icon={<FcHome />}>Home</MenuItem>
-          </Link>
-          <Link href='/search' passHref>
-            <MenuItem icon={<BsSearch />}>Search</MenuItem>
-          </Link>
-          <Link href='/search?purpose=for-rent' passHref>
-            <MenuItem icon={<FiKey />}>Rent Property</MenuItem>
-          </Link>
+const Navbar = () => {
+  const router = useRouter();
+  const { pathname } = router;
+  // Determine user role from localStorage (fallback to LANDLORD)
+  let userRole = 'LANDLORD';
+  if (typeof window !== 'undefined') {
+    const stored = window.localStorage.getItem('role');
+    if (stored) userRole = stored;
+  }
 
-        </MenuList>
-      </Menu>
-    </Box>
-  </Flex>
-);
+  const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
+  const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
+  return (
+    <Flex
+      px="6"
+      py="3"
+      align="center"
+      borderBottom="1px solid"
+      borderColor="gray.200"
+      bg="white"
+      position="sticky"
+      top="0"
+      zIndex="1000"
+    >
+      {/* Logo */}
+      <Box fontSize="2xl" fontWeight="bold" color="blue.500">
+        <Link href="/">RentMate</Link>
+      </Box>
+
+      <Spacer />
+
+      {/* Center Menu Items */}
+      <HStack spacing="8" fontSize="lg" fontWeight="medium">
+        {tabs.map((label) => (
+        <Link href={`/${label.toLowerCase()}`} key={label} passHref>
+          <Box
+            position="relative"
+            pb="1"
+            cursor="pointer"
+            _before={{
+              content: '""',
+              position: "absolute",
+              width: "0%",
+              height: "2px",
+              bottom: "0",
+              left: "0",
+              bg: "blue.500",
+              transition: "width 0.25s ease-in-out",
+            }}
+            _hover={{
+              color: "blue.600",
+              _before: { width: "100%" },
+            }}
+            transition="color 0.2s ease"
+          >
+            {label}
+          </Box>
+        </Link>
+        ))}
+      </HStack>
+
+      <Spacer />
+
+      {/* Right Side */}
+      <HStack spacing="4">
+        <NotificationDropdown />
+        <IconButton
+          aria-label="profile"
+          icon={<FaUserCircle size={28} />}
+          variant="ghost"
+        />
+      </HStack>
+    </Flex>
+  );
+};
 
 export default Navbar;

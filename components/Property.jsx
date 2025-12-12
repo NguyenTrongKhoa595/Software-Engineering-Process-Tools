@@ -1,81 +1,86 @@
+import { Image } from "@chakra-ui/react";
+import { Box, Flex, Text, Badge } from '@chakra-ui/layout';
+import { FaMapMarkerAlt, FaTag } from "react-icons/fa";
 import Link from 'next/link';
-import Image from 'next/image';
-import { Box, Flex, Text } from '@chakra-ui/layout';
-import { Avatar } from '@chakra-ui/avatar';
-import { FaBed, FaBath } from 'react-icons/fa';
-import { BsGridFill } from 'react-icons/bs';
-import { GoVerified } from 'react-icons/go';
-import millify from 'millify';
-import DefaultImage from '../assets/images/house.jpg';
-
-const Property = ({ property }) => {
+export default function Property({ property }) {
   const {
-    id,
-    coverPhoto,
-    price,
-    rentFrequency,
-    rooms,
     title,
-    baths,
-    area,
-    agency,
-    isVerified
+    price,
+    coverPhoto,
+    category,
+    location,
+    availability
   } = property;
 
   return (
-    <Link href={`/property/${id}`} passHref>
-      <Flex
-        flexWrap="wrap"
-        w="420px"
-        p="5"
-        paddingTop="0px"
-        justifyContent="flex-start"
+    <Link href={`/property/${property.id}`} style={{ textDecoration: "none" }}>
+      <Box
+        border="1px solid"
+        borderColor="gray.200"
+        rounded="lg"
+        overflow="hidden"
+        bg="white"
+        boxShadow="sm"
+        _hover={{ boxShadow: "md", transform: "scale(1.02)" }}
+        transition="0.2s ease"
         cursor="pointer"
+        width="400px"
+        m="3"
       >
-        <Box>
+        {/* Image Section */}
+        <Box position="relative">
           <Image
-            src={coverPhoto?.url || DefaultImage}
-            width={400}
-            height={260}
-            alt="property"
-            unoptimized={true}
+            src={coverPhoto?.url}
+            alt={title}
+            width="100%"
+            height="200px"
+            objectFit="cover"
           />
+
+          {/* Availability Badge */}
+          <Badge
+            position="absolute"
+            top="3"
+            right="3"
+            colorScheme={availability === "available" ? "green" : "orange"}
+            px="3"
+            py="1"
+            rounded="md"
+            fontWeight="600"
+          >
+            {availability}
+          </Badge>
         </Box>
 
-        <Box w="full">
-          <Flex paddingTop="2" alignItems="center" justifyContent="space-between">
-            <Flex alignItems="center">
-              <Box paddingRight="3" color="green.400">
-                {isVerified && <GoVerified />}
-              </Box>
-              <Text fontWeight="bold" fontSize="lg">
-                AED {price}
-                {rentFrequency ? `/${rentFrequency}` : ''}
-              </Text>
-            </Flex>
+        <Box p="4">
 
-            <Box>
-              <Avatar size="sm" src={agency?.logo?.url || ''} />
-            </Box>
+          {/* Title */}
+          <Text fontSize="lg" fontWeight="bold" mb="1">
+            {title}
+          </Text>
+
+          {/* Location */}
+          <Flex align="center" mb="1">
+            <FaMapMarkerAlt size={14} color="#4A5568" style={{ marginRight: "6px" }} />
+            <Text fontSize="sm" color="gray.600">
+              {location}
+            </Text>
           </Flex>
 
-          <Flex
-            alignItems="center"
-            p="1"
-            justifyContent="space-between"
-            w="250px"
-            color="blue.400"
-          >
-            {rooms} <FaBed /> | {baths} <FaBath /> | {millify(area)} sqft <BsGridFill />
+          {/* Property Type */}
+          <Flex align="center" mb="1">
+            <FaTag size={14} color="#4A5568" style={{ marginRight: "6px" }} />
+            <Text fontSize="sm" color="gray.600">
+              {category}
+            </Text>
           </Flex>
 
-          <Text fontSize="lg">
-            {title.length > 30 ? title.substring(0, 30) + '...' : title}
+          {/* Price */}
+          <Text fontSize="xl" fontWeight="bold" mt="2">
+            ${price.toLocaleString()}
           </Text>
         </Box>
-      </Flex>
+      </Box>
     </Link>
   );
-};
-
-export default Property;
+}

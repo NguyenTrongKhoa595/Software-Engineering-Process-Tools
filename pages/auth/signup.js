@@ -16,7 +16,7 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState } from "react";
 import RentMateLogo from '../assets/images/RentMate_logo.png';
-import AuthLayout from "../components/AuthLayout";
+import AuthLayout from "../../components/AuthLayout";
 
 function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);

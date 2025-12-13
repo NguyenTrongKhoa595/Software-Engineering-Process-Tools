@@ -1,6 +1,6 @@
 import { Box, Flex, Image, Input, Button, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import AuthLayout from "../components/AuthLayout";
+import AuthLayout from "../../components/AuthLayout";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();

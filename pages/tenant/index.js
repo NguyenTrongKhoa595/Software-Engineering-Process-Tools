@@ -56,14 +56,14 @@ const Home = () => {
         <Image
           src="/images/Header.png"
           alt="Header"
-          width={1200}
-          height={400}
+          width={1400}
+          height={500}
         />
 
         <Box
           position="absolute"
           bottom="100px"
-          left="50%"
+          left="52%"
           transform="translateX(-50%)"
           width="80%"
         >

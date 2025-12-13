@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { HStack, Box } from '@chakra-ui/react';
 import NavbarBase from './NavbarBase';
 
-const tabs = ["Employees", "Properties", "Documents", "Payments", "Communication", "Maintenance", "Property Requests"];
+const tabs = ["Employees", "Tenants" , "Properties", "Documents", "Payments", "Communication", "Maintenance"];
 
 export default function LandlordNavbar() {
   return (

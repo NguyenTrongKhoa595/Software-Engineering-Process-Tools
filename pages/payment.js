@@ -1,6 +1,37 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Text,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  VStack,
+  HStack,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  Divider,
+  Icon,
+  Grid,
+  GridItem,
+} from '@chakra-ui/react';
+import {
+  FiUser,
+  FiCreditCard,
+  FiLock,
+  FiCalendar,
+  FiCheckCircle,
+  FiAlertOctagon,
+  FiShield,
+} from 'react-icons/fi';
 
 export default function PaymentPage() {
   const [fullName, setFullName] = useState('');
@@ -33,29 +64,10 @@ export default function PaymentPage() {
         }
         if (id) setBillId(String(id));
         if (title) setPropertyTitle(String(title));
-        // Clear the data after reading (optional, for security)
-        // sessionStorage.removeItem('paymentData');
       } catch (e) {
         console.error('Error reading payment data:', e);
       }
     }
-
-    // Replace feather icons after mount
-    try {
-      if (typeof window !== 'undefined' && window.feather && typeof window.feather.replace === 'function') {
-        window.feather.replace();
-      }
-    } catch (e) {
-      // ignore
-    }
-    const t = setTimeout(() => {
-      try {
-        if (typeof window !== 'undefined' && window.feather && typeof window.feather.replace === 'function') {
-          window.feather.replace();
-        }
-      } catch (e) { }
-    }, 200);
-    return () => clearTimeout(t);
   }, []);
 
   // Format card number as user types (4-4-4-4)
@@ -133,134 +145,213 @@ export default function PaymentPage() {
       <Head>
         <title>PropertyPay - Secure Payment</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-        <script src="https://unpkg.com/feather-icons"></script>
       </Head>
 
-      <div className="bg-gray-50">
-        <div className="container mx-auto px-4 py-12 max-w-6xl">
-          <div className="flex flex-col lg:flex-row gap-8">
+      <Box bg="gray.50" minH="100vh">
+        <Container maxW="1400px" px={{ base: 4, md: 10 }} py={12}>
+          <Flex direction={{ base: 'column', lg: 'row' }} gap={12}>
             {/* Payment Form Column */}
-            <div className="lg:w-1/2">
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Make Payment</h2>
-                
-                <p className="text-gray-600 mb-6 flex items-center">
-                  <i data-feather="alert-octagon" className="w-5 h-5 text-yellow-500 mr-2"></i>
-                  Please enter complete information for payment to be made
-                </p>
+            <Box flex="1" maxW={{ lg: '50%' }} pr={{ lg: 8 }}>
+              <Box bg="white" borderRadius="xl" boxShadow="lg" p={8}>
+                <Heading size="xl" color="gray.800" mb={6}>
+                  Make Payment
+                </Heading>
+
+                <HStack spacing={2} mb={6} color="gray.600">
+                  <Icon as={FiAlertOctagon} boxSize={5} color="yellow.500" />
+                  <Text fontSize="sm">
+                    Please enter complete information for payment to be made
+                  </Text>
+                </HStack>
 
                 {/* Inline message */}
                 {message && (
-                  <div
-                    role="alert"
-                    aria-live="polite"
-                    className={`text-sm p-3 rounded mb-4 ${message.type === 'error' ? 'bg-red-50 border border-red-200 text-red-800' : 'bg-green-50 border border-green-200 text-green-800'}`}>
-                    {message.text}
-                  </div>
+                  <Alert
+                    status={message.type === 'error' ? 'error' : 'success'}
+                    borderRadius="md"
+                    mb={4}
+                  >
+                    <AlertIcon />
+                    <AlertDescription fontSize="sm">
+                      {message.text}
+                    </AlertDescription>
+                  </Alert>
                 )}
 
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                  <div>
-                    <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <div className="relative">
-                      <i data-feather="user" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                      <input id="fullname" name="fullname" value={fullName} onChange={(e) => setFullName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="John Doe" required />
-                    </div>
-                  </div>
+                <form onSubmit={handleSubmit}>
+                  <VStack spacing={6} align="stretch">
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="fullname" fontSize="sm" fontWeight="medium" color="gray.700">
+                        Full Name
+                      </FormLabel>
+                      <InputGroup>
+                        <InputLeftElement pointerEvents="none">
+                          <Icon as={FiUser} color="gray.400" />
+                        </InputLeftElement>
+                        <Input
+                          id="fullname"
+                          name="fullname"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="John Doe"
+                          size="lg"
+                          focusBorderColor="blue.500"
+                        />
+                      </InputGroup>
+                    </FormControl>
 
-                  <div>
-                    <label htmlFor="cardnumber" className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                    <div className="relative">
-                      <i data-feather="credit-card" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                      <input id="cardnumber" name="cardnumber" value={cardNumber} onChange={onCardNumberChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="1234 5678 9012 3456" required />
-                    </div>
-                  </div>
+                    <FormControl isRequired>
+                      <FormLabel htmlFor="cardnumber" fontSize="sm" fontWeight="medium" color="gray.700">
+                        Card Number
+                      </FormLabel>
+                      <InputGroup>
+                        <InputLeftElement pointerEvents="none">
+                          <Icon as={FiCreditCard} color="gray.400" />
+                        </InputLeftElement>
+                        <Input
+                          id="cardnumber"
+                          name="cardnumber"
+                          value={cardNumber}
+                          onChange={onCardNumberChange}
+                          placeholder="1234 5678 9012 3456"
+                          size="lg"
+                          focusBorderColor="blue.500"
+                        />
+                      </InputGroup>
+                    </FormControl>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="ccv" className="block text-sm font-medium text-gray-700 mb-1">CCV</label>
-                      <div className="relative">
-                        <i data-feather="lock" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input id="ccv" name="ccv" value={ccv} onChange={(e) => setCcv(e.target.value.replace(/\D/g, '').slice(0, 3))}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="123" required />
-                      </div>
-                    </div>
+                    <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                      <GridItem>
+                        <FormControl isRequired>
+                          <FormLabel htmlFor="ccv" fontSize="sm" fontWeight="medium" color="gray.700">
+                            CCV
+                          </FormLabel>
+                          <InputGroup>
+                            <InputLeftElement pointerEvents="none">
+                              <Icon as={FiLock} color="gray.400" />
+                            </InputLeftElement>
+                            <Input
+                              id="ccv"
+                              name="ccv"
+                              value={ccv}
+                              onChange={(e) => setCcv(e.target.value.replace(/\D/g, '').slice(0, 3))}
+                              placeholder="123"
+                              size="lg"
+                              focusBorderColor="blue.500"
+                            />
+                          </InputGroup>
+                        </FormControl>
+                      </GridItem>
 
-                    <div>
-                      <label htmlFor="expdate" className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
-                      <div className="relative">
-                        <i data-feather="calendar" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input id="expdate" name="expdate" type="month" value={expDate} min={getMinMonth()} onChange={(e) => setExpDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          required />
-                      </div>
-                    </div>
-                  </div>
+                      <GridItem>
+                        <FormControl isRequired>
+                          <FormLabel htmlFor="expdate" fontSize="sm" fontWeight="medium" color="gray.700">
+                            Expiration Date
+                          </FormLabel>
+                          <InputGroup>
+                            <InputLeftElement pointerEvents="none">
+                              <Icon as={FiCalendar} color="gray.400" />
+                            </InputLeftElement>
+                            <Input
+                              id="expdate"
+                              name="expdate"
+                              type="month"
+                              value={expDate}
+                              min={getMinMonth()}
+                              onChange={(e) => setExpDate(e.target.value)}
+                              size="lg"
+                              focusBorderColor="blue.500"
+                            />
+                          </InputGroup>
+                        </FormControl>
+                      </GridItem>
+                    </Grid>
 
-                  <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center mt-8">
-                    <i data-feather="check-circle" className="w-5 h-5 mr-2"></i>
-                    Complete Payment
-                  </button>
+                    <Button
+                      type="submit"
+                      colorScheme="blue"
+                      size="lg"
+                      w="100%"
+                      leftIcon={<Icon as={FiCheckCircle} />}
+                      mt={2}
+                    >
+                      Complete Payment
+                    </Button>
+                  </VStack>
                 </form>
-              </div>
-            </div>
+              </Box>
+            </Box>
 
-            { }
-            <div className="lg:w-1/2">
-              <div className="bg-gray-100 rounded-xl shadow-lg p-8 sticky top-4">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Payment Summary</h2>
+            {/* Payment Summary Column */}
+            <Box flex="1" maxW={{ lg: '50%' }} ml={{ lg: 8 }}>
+              <Box
+                bg="gray.100"
+                borderRadius="xl"
+                boxShadow="lg"
+                p={8}
+                position="sticky"
+                top="20px"
+              >
+                <Heading size="xl" color="gray.800" mb={6}>
+                  Payment Summary
+                </Heading>
 
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Bill Number</span>
-                    <span className="font-medium">{billId}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Property</span>
-                    <span className="font-medium">{propertyTitle || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Property Price</span>
-                    <span className="font-medium">{priceFromQuery ? `$${priceFromQuery.toLocaleString()}` : '$1,250,000'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Processing Fee</span>
-                    <span className="font-medium">$250</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">VAT (20%)</span>
-                    <span className="font-medium">{priceFromQuery ? `$${Math.round(priceFromQuery * 0.2).toLocaleString()}` : '$250,000'}</span>
-                  </div>
-                </div>
+                <VStack spacing={4} mb={6} align="stretch">
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Bill Number</Text>
+                    <Text fontWeight="medium">{billId}</Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Property</Text>
+                    <Text fontWeight="medium">{propertyTitle || 'N/A'}</Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Property Price</Text>
+                    <Text fontWeight="medium">
+                      {priceFromQuery ? `$${priceFromQuery.toLocaleString()}` : '$1,250,000'}
+                    </Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Processing Fee</Text>
+                    <Text fontWeight="medium">$250</Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">VAT (20%)</Text>
+                    <Text fontWeight="medium">
+                      {priceFromQuery ? `$${Math.round(priceFromQuery * 0.2).toLocaleString()}` : '$250,000'}
+                    </Text>
+                  </Flex>
+                </VStack>
 
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="flex justify-between">
-                    <span className="text-lg font-semibold">Total Amount</span>
-                    <span className="text-xl font-bold text-blue-600">{priceFromQuery ? `$${(priceFromQuery + 250 + Math.round(priceFromQuery * 0.2)).toLocaleString()}` : '$1,500,250'}</span>
-                  </div>
-                </div>
+                <Divider borderColor="gray.300" mb={4} />
 
-                <div className="mt-8 bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-start">
-                    <i data-feather="shield" className="text-blue-500 w-5 h-5 mt-1 mr-3"></i>
-                    <div>
-                      <p className="text-sm text-blue-800 font-medium">Secure Payment Guarantee</p>
-                      <p className="text-xs text-blue-600 mt-1">Your payment information is encrypted and processed securely.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <Flex justify="space-between" align="center">
+                  <Text fontSize="lg" fontWeight="semibold">Total Amount</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="blue.600">
+                    {priceFromQuery 
+                      ? `$${(priceFromQuery + 250 + Math.round(priceFromQuery * 0.2)).toLocaleString()}` 
+                      : '$1,500,250'}
+                  </Text>
+                </Flex>
+
+                <Box mt={8} bg="blue.50" p={4} borderRadius="lg">
+                  <HStack align="start" spacing={3}>
+                    <Icon as={FiShield} color="blue.500" boxSize={5} mt={0.5} />
+                    <VStack align="start" spacing={1}>
+                      <Text fontSize="sm" color="blue.800" fontWeight="medium">
+                        Secure Payment Guarantee
+                      </Text>
+                      <Text fontSize="xs" color="blue.600">
+                        Your payment information is encrypted and processed securely.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Box>
+              </Box>
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
     </>
   );
 }

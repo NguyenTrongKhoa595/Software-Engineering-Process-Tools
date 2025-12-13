@@ -53,28 +53,41 @@ const Home = () => {
     <Box>
       {/* Header */}
       <Box width="100%" height="450px" position="relative">
+        {/* Background Image */}
         <Image
           src="/images/Header.png"
           alt="Header"
-          width={1400}
-          height={500}
+          layout="fill"
+          objectFit="cover"
+          priority
         />
 
+        {/* Overlay Content */}
         <Box
           position="absolute"
-          bottom="100px"
-          left="52%"
-          transform="translateX(-50%)"
-          width="80%"
+          top="0"
+          left="0"
+          width="100%"
+          height="100%"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
         >
-          <SearchFilters />
+          <Box width="80%" maxW="1000px" mt="170px">
+            <SearchFilters />
+          </Box>
         </Box>
       </Box>
 
       {/* Property Grid */}
       <Box mt="10" px="6">
         {filteredProperties.length > 0 ? (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="8" justifyItems="center" mt="10">
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 3 }}
+            spacing="8"
+            justifyItems="center"
+            mt="10"
+          >
             {filteredProperties.map((property) => (
               <Property key={property.id} property={property} />
             ))}

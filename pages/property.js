@@ -26,6 +26,7 @@ import {
   FiCornerDownRight,
 } from 'react-icons/fi';
 import { fetchApi } from '../utils/fetchApi';
+import { mockData } from '../utils/mockData';
 
 export default function PropertyDetail({ property }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -78,9 +79,9 @@ export default function PropertyDetail({ property }) {
             </Box>
           </Flex>
 
-          <Flex direction={{ base: 'column', lg: 'row' }} gap={12} columnGap={{ lg: 12 }}>
+          <Flex direction={{ base: 'column', lg: 'row' }} gap={12} columnGap={{ lg: 8 }}>
             {/* Left Column - Images and Details */}
-            <Box flex="1" maxW={{ lg: '65%' }} pr={{ lg: 4 }}>
+            <Box flex="1" maxW={{ lg: '65%' }} pr={{ lg: 8 }}>
               {/* Main Image */}
               <Box
                 borderRadius="xl"
@@ -207,36 +208,16 @@ export default function PropertyDetail({ property }) {
 export async function getServerSideProps(context) {
   const { id } = context.query;
 
-  // fetch data (mocked by fetchApi)
-  const data = await fetchApi('/properties');
-  const hits = data && data.hits ? data.hits : [];
+  // Use mockData instead of fetchApi
+  const properties = mockData || [];
 
   // find property by id (support numeric or string ids)
-  const property = hits.find((h) => String(h.id) === String(id)) || hits[0] || null;
+  const property = properties.find((h) => String(h.id) === String(id)) || null;
 
-  // Map fields to match the expected structure
-  const mapped = property
-    ? {
-      id: property.id,
-      title: property.title,
-      coverPhoto: property.coverPhoto || { url: '' },
-      photos: property.photos || [],
-      price: property.price,
-      description: property.description || '',
-      location: property.location || '',
-      category: property.category || '',
-      availability: property.availability || '',
-      landlordName: property.landlordName || null,
-      landlordEmail: property.landlordEmail || null,
-      landlordPhone: property.landlordPhone || null,
-      landlordPhoto: property.landlordPhoto || null,
-      agency: property.agency || null,
-    }
-    : null;
-
+  // Return property directly as it already matches the expected structure
   return {
     props: {
-      property: mapped,
+      property: property,
     },
   };
 }

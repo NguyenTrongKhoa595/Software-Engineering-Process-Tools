@@ -8,10 +8,11 @@ const Navbar = () => {
   const router = useRouter();
   const { pathname } = router;
   // Determine user role from localStorage (fallback to LANDLORD)
-  let userRole = 'LANDLORD';
-  if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem('role');
-    if (stored) userRole = stored;
+  let userRole = null;
+
+  if (typeof window !== "undefined") {
+    const user = JSON.parse(localStorage.getItem("user"));
+    userRole = user?.role || null;
   }
 
   const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
@@ -30,7 +31,7 @@ const Navbar = () => {
     >
       {/* Logo */}
       <Box fontSize="2xl" fontWeight="bold" color="blue.500">
-        <Link href="/">RentMate</Link>
+        RentMate
       </Box>
 
       <Spacer />

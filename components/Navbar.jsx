@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { IconButton, Flex, Box, Spacer, HStack } from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { FaUserCircle } from 'react-icons/fa';
 import NotificationDropdown from './NotificationDropdown';
@@ -17,6 +18,12 @@ const Navbar = () => {
 
   const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
   const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    router.replace("/");
+  };
   return (
     <Flex
       px="6"
@@ -71,11 +78,25 @@ const Navbar = () => {
       {/* Right Side */}
       <HStack spacing="4">
         <NotificationDropdown />
-        <IconButton
-          aria-label="profile"
-          icon={<FaUserCircle size={28} />}
-          variant="ghost"
-        />
+
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label="Profile"
+            icon={<FaUserCircle size={28} />}
+            variant="ghost"
+          />
+
+          <MenuList>
+            <MenuItem onClick={() => router.push("/profile")}>
+              View Profile
+            </MenuItem>
+
+            <MenuItem color="red.500" onClick={handleLogout}>
+              Log out
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </HStack>
     </Flex>
   );

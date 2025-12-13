@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import Router from 'next/router';
-import Head from 'next/head';
 import NProgress from 'nprogress';
 import { ChakraProvider } from '@chakra-ui/react';
 
 import Layout from '../components/Layout';
-import 'nprogress/nprogress.css'; // Import CSS directly
+import 'nprogress/nprogress.css';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -18,7 +17,6 @@ function MyApp({ Component, pageProps }) {
     Router.events.on('routeChangeComplete', handleStop);
     Router.events.on('routeChangeError', handleStop);
 
-    // Clean up listeners on unmount
     return () => {
       Router.events.off('routeChangeStart', handleStart);
       Router.events.off('routeChangeComplete', handleStop);
@@ -26,11 +24,14 @@ function MyApp({ Component, pageProps }) {
     };
   }, []);
 
+  // ✅ This is the important part
+  const getLayout =
+    Component.getLayout ||
+    ((page) => <Layout>{page}</Layout>);
+
   return (
     <ChakraProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {getLayout(<Component {...pageProps} />)}
     </ChakraProvider>
   );
 }

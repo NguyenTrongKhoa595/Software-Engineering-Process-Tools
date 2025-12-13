@@ -1,5 +1,6 @@
 import { Box, Flex, Image, Input, Button, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import AuthLayout from "../components/AuthLayout";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -69,4 +70,8 @@ export default function ForgotPasswordPage() {
       </Flex>
     </Flex>
   );
+}
+
+ForgotPasswordPage.getLayout = function (page) {
+  return <AuthLayout>{page}</AuthLayout>;
 }

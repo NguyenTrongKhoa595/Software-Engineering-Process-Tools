@@ -16,9 +16,9 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState } from "react";
 import RentMateLogo from '../assets/images/RentMate_logo.png';
+import AuthLayout from "../components/AuthLayout";
 
-
-export default function SignupPage() {
+function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -139,3 +139,7 @@ export default function SignupPage() {
     </Flex>
   );
 }
+
+SignupPage.getLayout = (page) => <AuthLayout>{page}</AuthLayout>;
+
+export default SignupPage;

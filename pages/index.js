@@ -10,8 +10,8 @@ import {
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { login } from "../utils/authApi";
-
-export default function LoginPage() {
+import AuthLayout from "../components/AuthLayout";
+function LoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -178,3 +178,9 @@ export default function LoginPage() {
     </Flex>
   );
 }
+
+LoginPage.getLayout = function (page) {
+  return <AuthLayout>{page}</AuthLayout>;
+};
+
+export default LoginPage;

@@ -7,7 +7,6 @@ import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
   const router = useRouter();
-  const { pathname } = router;
   // Determine user role from localStorage (fallback to LANDLORD)
   let userRole = null;
 
@@ -16,7 +15,7 @@ const Navbar = () => {
     userRole = user?.role || null;
   }
 
-  const baseTabs = ["Properties", "Documents", "Communication", "Payments", "Requests"];
+  const baseTabs = ["Properties", "Documents", "Messages", "Payments", "Requests"];
   const tabs = userRole === 'PROPERTY_MANAGER' ? baseTabs : ["Employees", ...baseTabs];
 
   const handleLogout = () => {

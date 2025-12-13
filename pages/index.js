@@ -22,8 +22,25 @@ const Home = () => {
 
   // Get user role from localStorage
   useEffect(() => {
-    const role = localStorage.getItem('role');
-    setUserRole(role);
+    try {
+      const raw = localStorage.getItem('user');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const roleFromUser = parsed?.role || parsed?.app_role || parsed?.user_role || parsed?.roleName;
+        if (roleFromUser) {
+          setUserRole(roleFromUser);
+          return;
+        }
+      }
+
+      // fallback to legacy `role` key
+      const role = localStorage.getItem('role');
+      setUserRole(role);
+    } catch (err) {
+      // if parsing fails, fallback to simple role key
+      const role = localStorage.getItem('role');
+      setUserRole(role);
+    }
   }, []);
 
   // 🔍 Filter logic -----------------------------------------

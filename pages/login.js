@@ -1,9 +1,16 @@
-import { Box, Flex, Image, Input, Button, Text, Checkbox } from "@chakra-ui/react";
+import { Box, Flex, Image, Input, Button, Text, Checkbox, useToast } from "@chakra-ui/react";
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { apiPost } from '../utils/apiClient';
 
 export default function LoginPage() {
 
   const router = useRouter();
+  const toast = useToast();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   return (
     <Flex h="100vh" w="100%" >
@@ -50,7 +57,13 @@ export default function LoginPage() {
             pl={4}
             gap={2}
           >
-            <Input placeholder="Email " border="none" _focus={{ boxShadow: "none" }} />
+            <Input
+              placeholder="Email"
+              border="none"
+              _focus={{ boxShadow: "none" }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Flex>
 
           <Flex
@@ -64,7 +77,14 @@ export default function LoginPage() {
             pl={4}
             gap={2}
           >
-            <Input type="password" placeholder="Password" border="none" _focus={{ boxShadow: "none" }} />
+            <Input
+              type="password"
+              placeholder="Password"
+              border="none"
+              _focus={{ boxShadow: "none" }}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </Flex>
 
           <Flex w="100%" justify="space-between" mt={6} color="gray.600" fontSize="sm">
@@ -82,6 +102,67 @@ export default function LoginPage() {
             color="white"
             bg="blue.500"
             _hover={{ opacity: 0.9 }}
+            isLoading={loading}
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const payload = { email: email.trim(), password };
+                const res = await apiPost('/auth/login', payload);
+
+                console.debug('Auth response:', res);
+
+                const pick = (obj, keys) => {
+                  if (!obj) return null;
+                  for (const k of keys) {
+                    if (obj[k] !== undefined && obj[k] !== null) return obj[k];
+                  }
+                  return null;
+                };
+
+                // Try common token/user field names
+                let token = pick(res, ['token', 'accessToken', 'access_token', 'access', 'jwt', 'authToken']);
+                let user = pick(res, ['user', 'userInfo', 'profile']);
+
+                // Try nested data
+                if (!token && res && typeof res === 'object') {
+                  token = pick(res.data, ['token', 'accessToken', 'access_token', 'access']) || (res.data && res.data.tokens && res.data.tokens.access) || token;
+                }
+                if (!user && res && typeof res === 'object') {
+                  user = pick(res.data, ['user', 'userInfo', 'profile']) || user;
+                }
+
+                // Some APIs return { data: { accessToken, user } }
+                if (!token && res && res.data && typeof res.data === 'object') {
+                  token = pick(res.data, ['accessToken', 'token', 'access_token']);
+                }
+
+                if (!user && res && res.data && typeof res.data === 'object') {
+                  user = res.data.user || res.data;
+                }
+
+                if (!token || !user) {
+                  const debugStr = JSON.stringify(res, Object.keys(res || {}).slice(0, 20), 2);
+                  console.error('Unable to extract auth token/user from response', res);
+                  throw new Error('Invalid response from auth server — unexpected response shape: ' + (debugStr ? debugStr.slice(0, 400) : 'empty'));
+                }
+
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('accessToken', token);
+                  localStorage.setItem('user', JSON.stringify(user));
+                  if (user && user.id) localStorage.setItem('userId', String(user.id));
+                }
+
+                toast({ title: 'Signed in', description: 'Redirecting...', status: 'success', duration: 2000 });
+                router.push('/');
+              } catch (err) {
+                console.error('Login error', err);
+                const msg = err?.message || 'Login failed';
+                // Show a longer duration so user can read debug info if present
+                toast({ title: 'Login failed', description: msg, status: 'error', duration: 8000, isClosable: true });
+              } finally {
+                setLoading(false);
+              }
+            }}
           >
             Login
           </Button>

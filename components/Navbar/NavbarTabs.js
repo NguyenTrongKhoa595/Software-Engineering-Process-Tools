@@ -2,7 +2,13 @@
 export const landlordTabs = [
   { label: "Employees", path: "/landlord/employees" },
   { label: "Tenants", path: "/landlord/tenants" },
-  { label: "Properties", path: "/landlord/propertiesLandlord" },
+  {
+    label: "Properties",
+    children: [
+      { label: "View Requests", path: "/landlord/propertyLandlordView" },
+      { label: "Create Request", path: "/landlord/propertyCreate" },
+    ],
+  },
   { label: "Documents", path: "/landlord/documents" },
   { label: "Payments", path: "/landlord/payments" },
   { label: "Communication", path: "/messages" },

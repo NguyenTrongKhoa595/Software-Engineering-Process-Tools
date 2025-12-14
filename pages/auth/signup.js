@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useState } from "react";
-import RentMateLogo from '../assets/images/RentMate_logo.png';
+import RentMateLogo from '../../assets/images/RentMate_logo.png';
 import AuthLayout from "../../components/AuthLayout";
 
 function SignupPage() {
@@ -131,7 +131,7 @@ function SignupPage() {
         {/* Footer */}
         <Text textAlign="center" pt={6} color="gray.600">
           Already have an account?{" "}
-          <Link href="/login" color="blue.600" fontWeight="medium" _hover={{ textDecoration: "underline" }}>
+          <Link href="/auth/login" color="blue.600" fontWeight="medium" _hover={{ textDecoration: "underline" }}>
             Sign in
           </Link>
         </Text>

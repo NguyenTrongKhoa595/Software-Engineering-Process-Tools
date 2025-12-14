@@ -141,7 +141,7 @@ function LoginPage() {
               as="a"
               textDecoration="underline"
               cursor="pointer"
-              onClick={() => router.push("/forgot-password")}
+              onClick={() => router.push("/auth/forgot-password")}
             >
               Forgot password?
             </Text>
@@ -168,7 +168,7 @@ function LoginPage() {
               color="blue.400"
               cursor="pointer"
               _hover={{ textDecoration: "underline" }}
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/auth/signup")}
             >
               Sign up
             </Text>

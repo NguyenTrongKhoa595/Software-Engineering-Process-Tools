@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
               color="blue.400"
               cursor="pointer"
               _hover={{ textDecoration: "underline" }}
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/auth/login/")}
             >
               Back to Login
             </Text>

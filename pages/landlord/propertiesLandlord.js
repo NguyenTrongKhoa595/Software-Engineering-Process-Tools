@@ -14,6 +14,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { FiMapPin } from "react-icons/fi";
+import Link from "next/link";
 // Removed HeaderLogo per request
 
 const API_BASE =
@@ -84,9 +85,11 @@ export default function PropertiesPage() {
       <Box maxW="1400px" mx="auto" p={8}>
         <Flex justify="space-between" align="center" mb={6}>
           <Heading size="lg">Properties</Heading>
+          <Link href="/landlord/propertyCreate" passHref>
           <Button colorScheme="blue" leftIcon={<Text>+</Text>}>
             New
           </Button>
+          </Link>
         </Flex>
 
         {/* Properties Grid */}

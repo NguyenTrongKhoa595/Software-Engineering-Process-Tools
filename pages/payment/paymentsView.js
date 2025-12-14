@@ -60,6 +60,15 @@ export default function PaymentsPage() {
     fetchPayments();
   }, []);
 
+
+  const [role, setRole] = useState(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setRole(user?.role || null);
+    }
+  }, []);
+
   const fetchPayments = async () => {
     setLoading(true);
     try {
@@ -212,9 +221,11 @@ export default function PaymentsPage() {
               {payments.length} transactions
             </Badge>
           </HStack>
-          <Button colorScheme="blue" onClick={handleOpenNew}>
-            New Payment
-          </Button>
+          {role === "TENANT" && (
+            <Button colorScheme="blue" onClick={handleOpenNew}>
+              New Payment
+            </Button>
+          )}
         </Flex>
 
         {/* Payments Table */}

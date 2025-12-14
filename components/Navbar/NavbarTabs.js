@@ -10,14 +10,14 @@ export const landlordTabs = [
     ],
   },
   { label: "Documents", path: "/landlord/documents" },
-  { label: "Payments", path: "/landlord/payments" },
+  { label: "Payments", path: "/payment/paymentsView" },
   { label: "Communication", path: "/messages" },
   { label: "Maintenance", path: "/maintenance" },
 ];
 
 export const tenantTabs = [
   { label: "My Rental", path: "/tenant/properties" },
-  { label: "Payments", path: "/tenant/payments" },
+  { label: "Payments", path: "/payment/paymentsView" },
   {
     label: "Request Maintenance",
     children: [

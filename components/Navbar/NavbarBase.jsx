@@ -3,7 +3,7 @@ import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { FaUserCircle } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import NotificationDropdown from '../NotificationDropdown';
-
+import Logo from "./Logo";
 export default function NavbarBase({ children }) {
   const router = useRouter();
 
@@ -26,15 +26,7 @@ export default function NavbarBase({ children }) {
       zIndex="1000"
     >
       {/* Logo */}
-      <Box
-        fontSize="2xl"
-        fontWeight="bold"
-        color="blue.500"
-        cursor="pointer"
-        onClick={() => router.push("/")}
-      >
-        RentMate
-      </Box>
+      <Logo />
 
       <Spacer />
 

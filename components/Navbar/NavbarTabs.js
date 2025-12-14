@@ -9,7 +9,7 @@ export const landlordTabs = [
       { label: "Create Request", path: "/landlord/propertyCreate" },
     ],
   },
-  { label: "Documents", path: "/landlord/documents" },
+  { label: "Documents", path: "/property/select" },
   { label: "Payments", path: "/payment/paymentsView" },
   { label: "Communication", path: "/messages" },
   { label: "Maintenance", path: "/maintenance" },
@@ -26,5 +26,5 @@ export const tenantTabs = [
     ],
   },
   { label: "Messages", path: "/messages" },
-  { label: "My Documents", path: "/tenant/documents" }
+  { label: "My Documents", path: `/property/select` }
 ];

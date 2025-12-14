@@ -47,7 +47,16 @@ export default function NavbarBase({ children }) {
             variant="ghost"
           />
           <MenuList>
-            <MenuItem onClick={() => router.push("/profile")}>
+            <MenuItem
+              onClick={() => {
+                if (typeof window === "undefined") return;
+
+                const user = JSON.parse(localStorage.getItem("user"));
+                if (!user?.id) return;
+
+                router.push(`/profile/${user.id}`);
+              }}
+            >
               View Profile
             </MenuItem>
             <MenuItem color="red.500" onClick={handleLogout}>

@@ -426,20 +426,7 @@ export default function PersonalDocumentsPage() {
   }
 
   return (
-    <Flex direction="column" minH="100vh" bg="gray.50">
-      <Flex justify="center" mb={6} direction="column" align="center">
-          <Image
-              src={RentMateLogo.src}
-              alt="RentMate logo"
-              maxW="120px"
-              objectFit="contain"
-          />
-
-          <Text fontSize="xl" fontWeight="bold" color="teal.600" mt={2}>
-              RentMate
-          </Text>
-      </Flex>
-
+    <Flex direction="column" minH="100vh" bg="gray.50" pt={4}>
       {/* main card */}
       <Flex
         flex="1"

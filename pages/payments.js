@@ -32,12 +32,12 @@ import {
   SkeletonCircle,
 } from '@chakra-ui/react';
 import { FiTrash2, FiEdit2 } from 'react-icons/fi';
-import useRequireAuth from '../src/hooks/useRequireAuth';
-import { useAuth } from '../src/hooks/useAuth';
-// import { apiGet, apiPost } from '../utils/apiClient'; // Commented out for mock data
-import PageContainer from '../src/components/ui/PageContainer';
-import Card from '../src/components/ui/Card';
-import EmptyState from '../src/components/ui/EmptyState';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import { useAuth } from '@/hooks/useAuth';
+// import { apiGet, apiPost } from '@/utils/apiClient'; // Commented out for mock data
+import PageContainer from '@/components/ui/PageContainer';
+import Card from '@/components/ui/Card';
+import EmptyState from '@/components/ui/EmptyState';
 
 // --- Mock Data ---
 const mockPayments = [

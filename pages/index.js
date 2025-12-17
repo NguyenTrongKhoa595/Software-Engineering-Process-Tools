@@ -1,14 +1,13 @@
 import { Flex, Box, Text, Button, SlideFade, SimpleGrid } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Property from '../components/Property';
-import SearchFilters from '../components/SearchFilters';
-import { mockProperties } from '../utils/mockProperties';
-// Navbar handled by Layout; guest navbar hidden on home for clean hero
-import { useAuth } from '../src/hooks/useAuth';
-import PageContainer from '../src/components/ui/PageContainer';
-import SectionHeader from '../src/components/ui/SectionHeader';
-import SkeletonGrid from '../src/components/ui/SkeletonGrid';
+import Property from '@/components/Property';
+import SearchFilters from '@/components/SearchFilters';
+import { mockProperties } from '@/utils/mockProperties';
+import { useAuth } from '@/hooks/useAuth';
+import PageContainer from '@/components/ui/PageContainer';
+import SectionHeader from '@/components/ui/SectionHeader';
+import SkeletonGrid from '@/components/ui/SkeletonGrid';
 // ---------------- Home Page ----------------
 const Home = () => {
   const router = useRouter();
@@ -96,7 +95,7 @@ const Home = () => {
           <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600" mb={6}>
             Create an account to save your favorite listings and get updates.
           </Text>
-          <Button size="lg" colorScheme="blue" onClick={() => router.push('/signup')}>
+          <Button size="lg" colorScheme="blue" onClick={() => router.push('/auth/signup')}>
             Get Started
           </Button>
         </Box>

@@ -4,23 +4,21 @@
 export const NAV_ITEMS = {
   TENANT: [
     { label: 'Properties', href: '/properties' },
-    { label: 'Documents', href: '/property/select?returnTo=documents-tenant' },
+    { label: 'Documents', href: '/properties/select?returnTo=documents-tenant' },
     { label: 'Messages', href: '/messages' },
     { label: 'Payments', href: '/payments' },
-    { label: 'Requests', href: '/requests' },
+    { label: 'Requests', href: '/dashboard/requests' },
   ],
   LANDLORD: [
-    { label: 'Employees', href: '/employees' },
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Employees', href: '/dashboard/employees' },
     { label: 'Properties', href: '/properties' },
-    { label: 'Documents', href: '/property/select?returnTo=documents' },
     { label: 'Messages', href: '/messages' },
-    { label: 'Payments', href: '/payments' },
   ],
   PROPERTY_MANAGER: [
+    { label: 'Dashboard', href: '/dashboard' },
     { label: 'Properties', href: '/properties' },
-    { label: 'Documents', href: '/property/select?returnTo=documents' },
     { label: 'Messages', href: '/messages' },
-    { label: 'Payments', href: '/payments' },
   ],
 };
 

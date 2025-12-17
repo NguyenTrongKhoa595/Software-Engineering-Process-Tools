@@ -12,11 +12,12 @@ import {
   Heading,
   SkeletonCircle,
   SkeletonText,
+  Skeleton,
 } from '@chakra-ui/react';
 import { FiSend, FiSearch } from 'react-icons/fi';
-import useRequireAuth from '../src/hooks/useRequireAuth';
-import PageContainer from '../src/components/ui/PageContainer';
-import Card from '../src/components/ui/Card';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import PageContainer from '@/components/ui/PageContainer';
+import Card from '@/components/ui/Card';
 
 // --- Mock Data ---
 const mockConversations = [
@@ -144,4 +145,3 @@ const MessageInput = () => (
     <IconButton icon={<FiSend />} colorScheme="blue" size="lg" aria-label="Send message" />
   </HStack>
 );
-}

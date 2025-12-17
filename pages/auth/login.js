@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { apiPost } from '../utils/apiClient';
-import { useAuthStore } from '../src/store/authStore';
+import { apiPost } from '@/utils/apiClient';
+import { useAuthStore } from '@/store/authStore';
 import {
   Box,
   Flex,
@@ -119,7 +119,7 @@ export default function LoginPage() {
 
           <Flex w="100%" justify="space-between" align="center">
             <Checkbox size="md">Remember me</Checkbox>
-            <Link href="/forgot-password" passHref>
+            <Link href="/auth/forgot-password" passHref>
               <ChakraLink fontSize="sm" color="blue.500" _hover={{ textDecoration: 'underline' }}>
                 Forgot password?
               </ChakraLink>
@@ -138,7 +138,7 @@ export default function LoginPage() {
 
           <Text fontSize="sm" color="gray.600">
             Don't have an account?{' '}
-            <Link href="/signup" passHref>
+            <Link href="/auth/signup" passHref>
               <ChakraLink color="blue.500" fontWeight="medium" _hover={{ textDecoration: 'underline' }}>
                 Sign up
               </ChakraLink>

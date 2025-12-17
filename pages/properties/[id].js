@@ -21,9 +21,9 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { FaBed, FaBath, FaRulerCombined, FaCheckCircle } from 'react-icons/fa';
-import PageContainer from '../../src/components/ui/PageContainer';
-import Card from '../../src/components/ui/Card';
-import SectionHeader from '../../src/components/ui/SectionHeader';
+import PageContainer from '@/components/ui/PageContainer';
+import Card from '@/components/ui/Card';
+import SectionHeader from '@/components/ui/SectionHeader';
 
 // --- Mock Data for UI Development ---
 const mockProperty = {

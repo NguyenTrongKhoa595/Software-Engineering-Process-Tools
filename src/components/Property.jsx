@@ -1,7 +1,7 @@
 import { Image, Box, Flex, Text, Badge } from "@chakra-ui/react";
 import { FaMapMarkerAlt, FaTag } from "react-icons/fa";
 import Link from 'next/link';
-import Card from '../src/components/ui/Card';
+import Card from '@/components/ui/Card';
 
 export default function Property({ property = {} }) {
   const {
@@ -22,7 +22,7 @@ export default function Property({ property = {} }) {
   const isAvailable = availText.includes('available');
 
   return (
-    <Link href={`/property/${id}`} style={{ textDecoration: "none" }}>
+    <Link href={`/properties/${id}`} style={{ textDecoration: "none" }}>
       <Card clickable overflow="hidden">
         {/* Image Section */}
         <Box position="relative">

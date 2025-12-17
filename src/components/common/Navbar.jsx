@@ -16,8 +16,8 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { useAuth } from '../../hooks/useAuth';
-import { getNavItems } from '../../constants/nav';
+import { useAuth } from '@/hooks/useAuth';
+import { getNavItems } from '@/constants/nav';
 
 export default function Navbar() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -101,7 +101,7 @@ export default function Navbar() {
           />
         </MenuButton>
         <MenuList>
-          <MenuItem onClick={() => router.push(`/profile/${user?.id}`)}>
+          <MenuItem onClick={() => router.push(`/user/profile/${user?.id}`)}>
             My Profile
           </MenuItem>
           <MenuDivider />

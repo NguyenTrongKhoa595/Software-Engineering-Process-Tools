@@ -1,10 +1,10 @@
 import Head from 'next/head';
 import { Box } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import Footer from './Footer';
-import Navbar from '../src/components/common/Navbar'; // The new unified navbar
-import NavbarGuest from './NavbarGuest';
-import { useAuth } from '../src/hooks/useAuth';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/common/Navbar';
+import NavbarGuest from '@/components/NavbarGuest';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Layout({ children }) {
   const router = useRouter();

@@ -14,13 +14,13 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { FiMapPin } from "react-icons/fi";
-import { apiGet, apiDelete } from "../utils/apiClient";
-import PageContainer from "../src/components/ui/PageContainer";
-import SectionHeader from "../src/components/ui/SectionHeader";
-import SkeletonGrid from "../src/components/ui/SkeletonGrid";
-import EmptyState from "../src/components/ui/EmptyState";
-import { mockProperties } from "../utils/mockProperties";
-import Property from "../components/Property";
+import { apiGet, apiDelete } from '@/utils/apiClient';
+import PageContainer from '@/components/ui/PageContainer';
+import SectionHeader from '@/components/ui/SectionHeader';
+import SkeletonGrid from '@/components/ui/SkeletonGrid';
+import EmptyState from '@/components/ui/EmptyState';
+import { mockProperties } from '@/utils/mockProperties';
+import Property from '@/components/Property';
 
 // Removed HeaderLogo per request
 

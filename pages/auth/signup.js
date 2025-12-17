@@ -33,7 +33,7 @@ export default function SignupPage() {
     setTimeout(() => {
       toast({ title: 'Account created (mock)', status: 'success' });
       setLoading(false);
-      router.push('/login');
+      router.push('/auth/login');
     }, 1000);
   };
 
@@ -126,7 +126,7 @@ export default function SignupPage() {
 
           <Text fontSize="sm" color="gray.600">
             Already have an account?{' '}
-            <Link href="/login" passHref>
+            <Link href="/auth/login" passHref>
               <ChakraLink color="blue.500" fontWeight="medium" _hover={{ textDecoration: 'underline' }}>
                 Sign in
               </ChakraLink>

@@ -3,11 +3,11 @@ import Router from 'next/router';
 import Head from 'next/head';
 import NProgress from 'nprogress';
 import { ChakraProvider } from '@chakra-ui/react';
-import theme from '../src/styles/theme';
+import theme from '@/styles/theme';
 
-import Layout from '../components/Layout';
+import Layout from '@/components/Layout';
 import 'nprogress/nprogress.css';
-import { useAuthStore } from '../src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 function MyApp({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => <Layout>{page}</Layout>);

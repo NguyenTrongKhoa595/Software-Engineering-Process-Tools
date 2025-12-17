@@ -20,11 +20,11 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { FiUser, FiShield, FiFileText, FiLogOut } from 'react-icons/fi';
-import useRequireAuth from '../../src/hooks/useRequireAuth';
-import { useAuth } from '../../src/hooks/useAuth';
-// import { apiGet, apiPut } from '../../utils/apiClient'; // Commented out for mock data
-import PageContainer from '../../src/components/ui/PageContainer';
-import Card from '../../src/components/ui/Card';
+import useRequireAuth from '@/hooks/useRequireAuth';
+import { useAuth } from '@/hooks/useAuth';
+// import { apiGet, apiPut } from '@/utils/apiClient'; // Commented out for mock data
+import PageContainer from '@/components/ui/PageContainer';
+import Card from '@/components/ui/Card';
 
 // --- Mock Data ---
 const mockUser = {

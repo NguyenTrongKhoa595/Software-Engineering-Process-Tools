@@ -19,6 +19,7 @@ import PageContainer from "../src/components/ui/PageContainer";
 import SectionHeader from "../src/components/ui/SectionHeader";
 import SkeletonGrid from "../src/components/ui/SkeletonGrid";
 import EmptyState from "../src/components/ui/EmptyState";
+import { mockProperties } from "../utils/mockProperties";
 import Property from "../components/Property";
 
 // Removed HeaderLogo per request
@@ -34,25 +35,33 @@ export default function PropertiesPage() {
 
   const fetchProperties = async () => {
     setLoading(true);
-    try {
-      const data = await apiGet('/properties?size=20&page=0');
-      const list = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.content)
-        ? data.content
-        : [];
-      setProperties(list);
-    } catch (e) {
-      console.error(e);
-      setProperties([]); // Clear properties on error
-      toast({
-        status: 'error',
-        title: 'Failed to load properties',
-        description: 'Please try again later.',
-      });
-    } finally {
+    // --- API LOGIC (COMMENTED OUT) ---
+    // try {
+    //   const data = await apiGet('/properties?size=20&page=0');
+    //   const list = Array.isArray(data)
+    //     ? data
+    //     : Array.isArray(data?.content)
+    //     ? data.content
+    //     : [];
+    //   setProperties(list);
+    // } catch (e) {
+    //   console.error(e);
+    //   setProperties([]); // Clear properties on error
+    //   toast({
+    //     status: 'error',
+    //     title: 'Failed to load properties',
+    //     description: 'Please try again later.',
+    //   });
+    // } finally {
+    //   setLoading(false);
+    // }
+
+    // --- MOCK DATA LOGIC ---
+    setTimeout(() => {
+      setProperties(mockProperties);
       setLoading(false);
-    }
+      toast({ status: "info", title: "Displaying mock properties" });
+    }, 1000);
   };
 
   return (

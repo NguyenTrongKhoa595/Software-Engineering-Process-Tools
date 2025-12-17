@@ -34,10 +34,18 @@ import {
 import { FiTrash2, FiEdit2 } from 'react-icons/fi';
 import useRequireAuth from '../src/hooks/useRequireAuth';
 import { useAuth } from '../src/hooks/useAuth';
-import { apiGet, apiPost } from '../utils/apiClient';
+// import { apiGet, apiPost } from '../utils/apiClient'; // Commented out for mock data
 import PageContainer from '../src/components/ui/PageContainer';
 import Card from '../src/components/ui/Card';
 import EmptyState from '../src/components/ui/EmptyState';
+
+// --- Mock Data ---
+const mockPayments = [
+  { id: 1, description: 'Monthly Rent - Dec 2025', amount: 2500, status: 'COMPLETED', paymentDate: '2025-12-01', payer: { fullName: 'John Doe' } },
+  { id: 2, description: 'Security Deposit', amount: 1250, status: 'COMPLETED', paymentDate: '2025-11-15', payer: { fullName: 'John Doe' } },
+  { id: 3, description: 'Monthly Rent - Nov 2025', amount: 2500, status: 'COMPLETED', paymentDate: '2025-11-01', payer: { fullName: 'John Doe' } },
+  { id: 4, description: 'Late Fee - Oct 2025', amount: 50, status: 'PENDING', paymentDate: '2025-10-31', payer: { fullName: 'John Doe' } },
+];
 
 // --- Skeleton Component ---
 const PaymentsSkeleton = () => (
@@ -72,45 +80,65 @@ export default function PaymentsPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    if (!leaseId) {
+    setLoading(true);
+    // --- MOCK DATA LOGIC ---
+    setTimeout(() => {
+      setPayments(leaseId ? mockPayments : []);
       setLoading(false);
-      setPayments([]);
-      return;
-    }
-    const fetchPayments = async () => {
-      setLoading(true);
-      try {
-        const data = await apiGet(`/payments/lease/${leaseId}`);
-        setPayments(Array.isArray(data) ? data : []);
-      } catch (err) {
-        toast({ status: 'error', title: 'Failed to load payments', description: err.message });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPayments();
+    }, 1000);
+
+    // --- API LOGIC (COMMENTED OUT) ---
+    // if (!leaseId) {
+    //   setLoading(false);
+    //   setPayments([]);
+    //   return;
+    // }
+    // const fetchPayments = async () => {
+    //   setLoading(true);
+    //   try {
+    //     const data = await apiGet(`/payments/lease/${leaseId}`);
+    //     setPayments(Array.isArray(data) ? data : []);
+    //   } catch (err) {
+    //     toast({ status: 'error', title: 'Failed to load payments', description: err.message });
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    // fetchPayments();
   }, [leaseId, toast]);
 
-  const handleNewPayment = async (formData) => {
-    if (!leaseId) return;
-    try {
-      const payload = {
-        amount: parseFloat(formData.amount || 0),
-        paymentDate: formData.paymentDate || null,
-        type: formData.type || 'RENT',
-        paymentMethod: 'Online Portal',
-        description: formData.description || '',
-      };
+  const handleNewPayment = (formData) => {
+    // --- MOCK SAVE LOGIC ---
+    const newPayment = {
+      id: Math.random(),
+      description: formData.description,
+      amount: parseFloat(formData.amount || 0),
+      paymentDate: formData.paymentDate,
+      status: 'COMPLETED',
+      payer: { fullName: 'Current User' },
+    };
+    setPayments(prev => [newPayment, ...prev]);
+    toast({ status: 'success', title: 'Payment created (mock)' });
+    onClose();
 
-      const endpoint = role === 'TENANT' ? `/payments/lease/${leaseId}/pay` : `/payments/lease/${leaseId}`;
-      const newPayment = await apiPost(endpoint, payload);
-
-      setPayments((prev) => [newPayment, ...prev]);
-      toast({ status: 'success', title: 'Payment created' });
-      onClose();
-    } catch (err) {
-      toast({ status: 'error', title: 'Failed to create payment', description: err.message });
-    }
+    // --- API LOGIC (COMMENTED OUT) ---
+    // if (!leaseId) return;
+    // try {
+    //   const payload = {
+    //     amount: parseFloat(formData.amount || 0),
+    //     paymentDate: formData.paymentDate || null,
+    //     type: formData.type || 'RENT',
+    //     paymentMethod: 'Online Portal',
+    //     description: formData.description || '',
+    //   };
+    //   const endpoint = role === 'TENANT' ? `/payments/lease/${leaseId}/pay` : `/payments/lease/${leaseId}`;
+    //   const newPayment = await apiPost(endpoint, payload);
+    //   setPayments((prev) => [newPayment, ...prev]);
+    //   toast({ status: 'success', title: 'Payment created' });
+    //   onClose();
+    // } catch (err) {
+    //   toast({ status: 'error', title: 'Failed to create payment', description: err.message });
+    // }
   };
 
   if (!canRender) return null;

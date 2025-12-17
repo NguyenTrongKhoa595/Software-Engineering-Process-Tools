@@ -22,9 +22,19 @@ import {
 import { FiUser, FiShield, FiFileText, FiLogOut } from 'react-icons/fi';
 import useRequireAuth from '../../src/hooks/useRequireAuth';
 import { useAuth } from '../../src/hooks/useAuth';
-import { apiGet, apiPut } from '../../utils/apiClient';
+// import { apiGet, apiPut } from '../../utils/apiClient'; // Commented out for mock data
 import PageContainer from '../../src/components/ui/PageContainer';
 import Card from '../../src/components/ui/Card';
+
+// --- Mock Data ---
+const mockUser = {
+  id: '123',
+  fullName: 'Alexandra Daddario',
+  email: 'alex.daddario@example.com',
+  phoneNumber: '+1 234 567 8900',
+  role: 'TENANT',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200',
+};
 
 // --- Skeleton Component ---
 const ProfileSkeleton = () => (
@@ -47,38 +57,51 @@ const ProfileSkeleton = () => (
 export default function ProfilePage() {
   const canRender = useRequireAuth();
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = router.query; // Kept for URL consistency
   const toast = useToast();
-  const { user: authUser, logout } = useAuth();
+  const { logout } = useAuth();
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    if (!id) return;
-    const loadProfile = async () => {
-      setLoading(true);
-      try {
-        const data = await apiGet(`/users/${id}`);
-        setUser(data);
-      } catch (err) {
-        toast({ status: 'error', title: 'Failed to load profile' });
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProfile();
+    setLoading(true);
+    // --- MOCK DATA LOGIC ---
+    setTimeout(() => {
+      setUser(mockUser);
+      setLoading(false);
+    }, 1000);
+
+    // --- API LOGIC (COMMENTED OUT) ---
+    // if (!id) return;
+    // const loadProfile = async () => {
+    //   setLoading(true);
+    //   try {
+    //     const data = await apiGet(`/users/${id}`);
+    //     setUser(data);
+    //   } catch (err) {
+    //     toast({ status: 'error', title: 'Failed to load profile' });
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    // loadProfile();
   }, [id, toast]);
 
-  const handleSave = async (formData) => {
-    try {
-      const updated = await apiPut(`/users/${id}`, formData);
-      setUser(updated);
-      toast({ title: 'Profile updated', status: 'success' });
-    } catch (err) {
-      toast({ title: 'Update failed', description: err.message, status: 'error' });
-    }
+  const handleSave = (formData) => {
+    // --- MOCK SAVE LOGIC ---
+    setUser(prev => ({ ...prev, ...formData }));
+    toast({ title: 'Profile updated (mock)', status: 'success' });
+
+    // --- API LOGIC (COMMENTED OUT) ---
+    // try {
+    //   const updated = await apiPut(`/users/${id}`, formData);
+    //   setUser(updated);
+    //   toast({ title: 'Profile updated', status: 'success' });
+    // } catch (err) {
+    //   toast({ title: 'Update failed', description: err.message, status: 'error' });
+    // }
   };
 
   const handleLogout = () => {

@@ -33,3 +33,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Project Foler
+/API_DOCUMENTS
+/Refactor_Plan

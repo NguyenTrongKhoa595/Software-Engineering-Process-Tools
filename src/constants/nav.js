@@ -4,7 +4,7 @@
 export const NAV_ITEMS = {
   TENANT: [
     { label: 'Properties', href: '/properties' },
-    { label: 'Documents', href: '/properties/select?returnTo=documents-tenant' },
+    { label: 'Documents', href: '/properties/select?returnTo=properties' },
     { label: 'Messages', href: '/messages' },
     { label: 'Payments', href: '/payments' },
     { label: 'Requests', href: '/dashboard/requests' },

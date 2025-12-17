@@ -14,10 +14,14 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { FiMapPin } from "react-icons/fi";
-// Removed HeaderLogo per request
+import { apiGet, apiDelete } from "../utils/apiClient";
+import PageContainer from "../src/components/ui/PageContainer";
+import SectionHeader from "../src/components/ui/SectionHeader";
+import SkeletonGrid from "../src/components/ui/SkeletonGrid";
+import EmptyState from "../src/components/ui/EmptyState";
+import Property from "../components/Property";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api";
+// Removed HeaderLogo per request
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState([]);
@@ -31,127 +35,46 @@ export default function PropertiesPage() {
   const fetchProperties = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/properties`);
-      if (!res.ok) throw new Error("Failed to fetch properties");
-      const data = await res.json();
-      setProperties(data);
+      const data = await apiGet('/properties?size=20&page=0');
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.content)
+        ? data.content
+        : [];
+      setProperties(list);
     } catch (e) {
       console.error(e);
+      setProperties([]); // Clear properties on error
       toast({
-        status: "error",
-        title: "Failed to load properties",
+        status: 'error',
+        title: 'Failed to load properties',
+        description: 'Please try again later.',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelect = (propertyId) => {
-    // Navigate to property details or perform action
-    toast({
-      status: "info",
-      title: `Property ${propertyId} selected`,
-    });
-  };
-
-  const handleRemove = async (propertyId) => {
-    if (!confirm("Are you sure you want to remove this property?")) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/properties/${propertyId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to remove property");
-
-      setProperties((prev) => prev.filter((p) => p.id !== propertyId));
-      toast({
-        status: "success",
-        title: "Property removed",
-      });
-    } catch (e) {
-      console.error(e);
-      toast({
-        status: "error",
-        title: "Failed to remove property",
-      });
-    }
-  };
-
   return (
     <Box minH="100vh" bg="gray.50">
-
-      {/* Main Content */}
-      <Box maxW="1400px" mx="auto" p={8}>
+      <PageContainer>
         <Flex justify="space-between" align="center" mb={6}>
           <Heading size="lg">Properties</Heading>
-          <Button colorScheme="blue" leftIcon={<Text>+</Text>}>
-            New
-          </Button>
+          <Button colorScheme="blue">New</Button>
         </Flex>
 
-        {/* Properties Grid */}
         {loading ? (
-          <Text textAlign="center" py={10}>
-            Loading properties...
-          </Text>
+          <SkeletonGrid count={6} />
         ) : properties.length === 0 ? (
-          <Text textAlign="center" py={10}>
-            No properties found
-          </Text>
+          <EmptyState title="No properties found" description="Try adjusting your filters or check back later." />
         ) : (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 5 }} spacing={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} spacing={6}>
             {properties.map((property) => (
-              <Box
-                key={property.id}
-                bg="white"
-                rounded="lg"
-                overflow="hidden"
-                shadow="sm"
-                border="1px"
-                borderColor="gray.200"
-              >
-                {/* Property Image */}
-                <Box position="relative" h="200px" bg="gray.200">
-                  <Image
-                    src={property.imageUrl || "/placeholder-property.jpg"}
-                    alt={property.address}
-                    objectFit="cover"
-                    w="100%"
-                    h="100%"
-                  />
-                </Box>
-
-                {/* Property Details */}
-                <VStack align="stretch" p={4} spacing={3}>
-                  <HStack spacing={2} color="gray.600" fontSize="sm">
-                    <FiMapPin />
-                    <Text noOfLines={1}>{property.address}</Text>
-                  </HStack>
-
-                  {/* Action Buttons */}
-                  <VStack spacing={2}>
-                    <Button
-                      colorScheme="blue"
-                      w="100%"
-                      onClick={() => handleSelect(property.id)}
-                    >
-                      Select
-                    </Button>
-                    <Button
-                      colorScheme="red"
-                      variant="solid"
-                      w="100%"
-                      onClick={() => handleRemove(property.id)}
-                    >
-                      Remove
-                    </Button>
-                  </VStack>
-                </VStack>
-              </Box>
+              <Property property={property} key={property.id} />
             ))}
           </SimpleGrid>
         )}
-      </Box>
+      </PageContainer>
     </Box>
   );
 }

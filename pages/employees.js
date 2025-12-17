@@ -1,23 +1,18 @@
-// pages/employees.js
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
   Heading,
   Button,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Avatar,
   HStack,
   Text,
   Badge,
   IconButton,
-  useToast,
+  useDisclosure,
+  VStack,
+  Skeleton,
+  SkeletonCircle,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -29,295 +24,143 @@ import {
   FormLabel,
   Input,
   Select,
-  useDisclosure,
-  Checkbox,
-} from "@chakra-ui/react";
-import { FiTrash2, FiEdit2 } from "react-icons/fi";
+} from '@chakra-ui/react';
+import { FiTrash2, FiEdit2, FiPlus } from 'react-icons/fi';
+import useRequireAuth from '../src/hooks/useRequireAuth';
+import PageContainer from '../src/components/ui/PageContainer';
+import Card from '../src/components/ui/Card';
+import EmptyState from '../src/components/ui/EmptyState';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/api";
+// --- Mock Data ---
+const mockEmployees = [
+  { id: 1, name: 'Olivia Rhye', email: 'olivia@example.com', role: 'Property Manager', status: 'Active', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
+  { id: 2, name: 'Phoenix Baker', email: 'phoenix@example.com', role: 'Maintenance Staff', status: 'Active', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' },
+  { id: 3, name: 'Lana Steiner', email: 'lana@example.com', role: 'Leasing Agent', status: 'Inactive', avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100' },
+];
 
+// --- Skeleton Component ---
+const EmployeeCardSkeleton = () => (
+  <Card p={4}>
+    <Flex justify="space-between" align="center">
+      <HStack spacing={4}>
+        <SkeletonCircle size="12" />
+        <VStack align="start">
+          <Skeleton h="20px" w="120px" />
+          <Skeleton h="16px" w="180px" />
+        </VStack>
+      </HStack>
+      <Skeleton h="24px" w="80px" borderRadius="full" />
+    </Flex>
+  </Card>
+);
+
+// --- Sub-components ---
+const EmployeeCard = ({ employee, onEdit, onDelete }) => (
+  <Card p={4}>
+    <Flex justify="space-between" align="center">
+      <HStack spacing={4}>
+        <Avatar name={employee.name} src={employee.avatarUrl} />
+        <VStack align="start" spacing={0}>
+          <Text fontWeight="bold">{employee.name}</Text>
+          <Text fontSize="sm" color="gray.500">{employee.email}</Text>
+        </VStack>
+      </HStack>
+      <HStack>
+        <Badge colorScheme={employee.status === 'Active' ? 'green' : 'gray'}>{employee.status}</Badge>
+        <IconButton icon={<FiEdit2 />} size="sm" variant="ghost" aria-label="Edit" onClick={() => onEdit(employee)} />
+        <IconButton icon={<FiTrash2 />} size="sm" variant="ghost" colorScheme="red" aria-label="Delete" onClick={() => onDelete(employee.id)} />
+      </HStack>
+    </Flex>
+  </Card>
+);
+
+// --- Main Page Component ---
 export default function EmployeesPage() {
-  const toast = useToast();
-  const router = useRouter();
+  const canRender = useRequireAuth();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onClose: onEditClose,
-  } = useDisclosure();
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    status: "On Job",
-    hireDate: "",
-  });
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    fetchEmployees();
+    setLoading(true);
+    setTimeout(() => {
+      setEmployees(mockEmployees);
+      setLoading(false);
+    }, 1000);
   }, []);
 
-  const fetchEmployees = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/employees`);
-      if (!res.ok) throw new Error("Failed to load employees");
-      const data = await res.json();
-      // Map any 'Pending' status to 'On Job' per requirement
-      const normalized = Array.isArray(data)
-        ? data.map((e) => ({
-            ...e,
-            status: e.status === "Pending" ? "On Job" : e.status,
-          }))
-        : [];
-      setEmployees(normalized);
-    } catch (e) {
-      console.error(e);
-      // Fallback demo data to visualize UI if API missing
-      setEmployees([
-        {
-          id: 1,
-          name: "Olivia Rhye",
-          handle: "@olivia",
-          email: "olivia@untitledui.com",
-          status: "On Job",
-          hireDate: "2022-01-06",
-          role: "Manager",
-          avatarColor: "purple.500",
-        },
-        {
-          id: 2,
-          name: "Phoenix Baker",
-          handle: "@phoenix",
-          email: "phoenix@untitledui.com",
-          status: "Suspended",
-          hireDate: "2022-01-06",
-          role: "Manager",
-          avatarColor: "orange.500",
-        },
-        {
-          id: 3,
-          name: "Lana Steiner",
-          handle: "@lana",
-          email: "lana@untitledui.com",
-          status: "On Job",
-          hireDate: "2022-01-06",
-          role: "Manager",
-          avatarColor: "pink.500",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openNew = () => {
-    setFormData({ name: "", email: "", status: "On Job", hireDate: "" });
-    setSelected(null);
+  const handleOpenModal = (employee = null) => {
+    setSelected(employee);
     onOpen();
   };
 
-  const openEdit = (emp) => {
-    setSelected(emp);
-    setFormData({
-      name: emp.name || "",
-      email: emp.email || "",
-      status: emp.status || "Pending",
-      hireDate: emp.hireDate || "",
-    });
-    onEditOpen();
-  };
-
-  const createEmployee = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/employees`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const created = res.ok ? await res.json() : { id: Date.now(), ...formData };
-      setEmployees((prev) => [...prev, created]);
-      toast({ status: "success", title: "Employee added" });
-      onClose();
-    } catch (e) {
-      console.error(e);
-      toast({ status: "error", title: "Failed to add employee" });
-    }
-  };
-
-  const updateEmployee = async () => {
-    if (!selected) return;
-    try {
-      const res = await fetch(`${API_BASE}/employees/${selected.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const updated = res.ok ? await res.json() : { ...selected, ...formData };
-      setEmployees((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
-      toast({ status: "success", title: "Employee updated" });
-      onEditClose();
-    } catch (e) {
-      console.error(e);
-      toast({ status: "error", title: "Failed to update employee" });
-    }
-  };
-
-  const deleteEmployee = async (id) => {
-    if (!confirm("Remove this employee?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/employees/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
-      setEmployees((prev) => prev.filter((e) => e.id !== id));
-      toast({ status: "success", title: "Employee removed" });
-    } catch (e) {
-      console.error(e);
-      // Optimistic removal if API missing
-      setEmployees((prev) => prev.filter((e) => e.id !== id));
-      toast({ status: "success", title: "Employee removed" });
-    }
-  };
-
-  const statusBadge = (status) => {
-    const map = {
-      "On Job": { color: "green", label: "On Job" },
-      "Suspended": { color: "red", label: "Suspended" },
-      // Pending removed
-    };
-    const meta = map[status] || { color: "gray", label: status };
-    return (
-      <Badge colorScheme={meta.color} px={3} py={1} rounded="full">
-        {meta.label}
-      </Badge>
-    );
-  };
+  if (!canRender) return null;
 
   return (
-    <Box minH="100vh" bg="gray.50">
-      {/* No logo/header per request */}
-      <Box maxW="1200px" mx="auto" p={8}>
-        <Flex justify="space-between" align="center" mb={6}>
-          <Heading size="lg">Employees</Heading>
-          <Button colorScheme="blue" onClick={openNew}>+ New</Button>
-        </Flex>
+    <PageContainer>
+      <Flex justify="space-between" align="center" mb={6}>
+        <Heading size="lg">Manage Employees</Heading>
+        <Button leftIcon={<FiPlus />} colorScheme="blue" onClick={() => handleOpenModal()}>
+          New Employee
+        </Button>
+      </Flex>
 
-        <Box bg="white" rounded="lg" shadow="sm" overflow="hidden">
-          <Table variant="simple">
-            <Thead bg="gray.50">
-              <Tr>
-                <Th>Name</Th>
-                <Th>Status</Th>
-                <Th>Email address</Th>
-                <Th>Hired Date</Th>
-                <Th></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {loading ? (
-                <Tr>
-                  <Td colSpan={5} textAlign="center" py={8}>Loading...</Td>
-                </Tr>
-              ) : employees.length === 0 ? (
-                <Tr>
-                  <Td colSpan={5} textAlign="center" py={8}>No employees</Td>
-                </Tr>
-              ) : (
-                employees.map((emp) => (
-                  <Tr key={emp.id} _hover={{ bg: "gray.50" }}>
-                    <Td>
-                      <HStack spacing={3}>
-                        <Avatar 
-                          size="sm" 
-                          name={emp.name} 
-                          bg={emp.avatarColor || "gray.500"} 
-                          cursor="pointer"
-                          onClick={() => router.push(`/profile/${emp.id}`)}
-                          _hover={{ opacity: 0.8 }}
-                        />
-                        <Box>
-                          <Text fontWeight="medium">{emp.name}</Text>
-                        </Box>
-                      </HStack>
-                    </Td>
-                    <Td>{statusBadge(emp.status)}</Td>
-                    <Td color="gray.700">{emp.email}</Td>
-                    <Td color="gray.600">{new Date(emp.hireDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</Td>
-                    <Td>
-                      <HStack spacing={2}>
-                        <IconButton aria-label="Delete" icon={<FiTrash2 />} size="sm" variant="ghost" colorScheme="red" onClick={() => deleteEmployee(emp.id)} />
-                        <IconButton aria-label="Edit" icon={<FiEdit2 />} size="sm" variant="ghost" colorScheme="blue" onClick={() => openEdit(emp)} />
-                      </HStack>
-                    </Td>
-                  </Tr>
-                ))
-              )}
-            </Tbody>
-          </Table>
-        </Box>
-      </Box>
+      {loading ? (
+        <VStack spacing={4} align="stretch">
+          {[...Array(3)].map((_, i) => <EmployeeCardSkeleton key={i} />)}
+        </VStack>
+      ) : employees.length === 0 ? (
+        <Card p={10}>
+          <EmptyState title="No Employees Found" description="Get started by adding your first team member." />
+        </Card>
+      ) : (
+        <VStack spacing={4} align="stretch">
+          {employees.map((emp) => (
+            <EmployeeCard key={emp.id} employee={emp} onEdit={handleOpenModal} onDelete={() => {}} />
+          ))}
+        </VStack>
+      )}
 
-      {/* New Employee Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>New Employee</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl mb={4}>
-              <FormLabel>Name</FormLabel>
-              <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Email</FormLabel>
-              <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Status</FormLabel>
-              <Select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-                <option value="On Job">On Job</option>
-                <option value="Suspended">Suspended</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Hired Date</FormLabel>
-              <Input type="date" value={formData.hireDate} onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })} />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
-            <Button colorScheme="blue" onClick={createEmployee}>Create</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Edit Employee Modal */}
-      <Modal isOpen={isEditOpen} onClose={onEditClose} size="lg">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Employee</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl mb={4}>
-              <FormLabel>Status</FormLabel>
-              <Select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-                <option value="On Job">On Job</option>
-                <option value="Suspended">Suspended</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Hired Date</FormLabel>
-              <Input type="date" value={formData.hireDate} onChange={(e) => setFormData({ ...formData, hireDate: e.target.value })} />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onEditClose}>Cancel</Button>
-            <Button colorScheme="blue" onClick={updateEmployee}>Update</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </Box>
+      <EmployeeModal isOpen={isOpen} onClose={onClose} employee={selected} />
+    </PageContainer>
   );
 }
+
+// --- Modal Component ---
+const EmployeeModal = ({ isOpen, onClose, employee }) => (
+  <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>{employee ? 'Edit Employee' : 'Add New Employee'}</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <VStack spacing={4}>
+          <FormControl isRequired>
+            <FormLabel>Full Name</FormLabel>
+            <Input defaultValue={employee?.name} placeholder="John Doe" />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Email</FormLabel>
+            <Input type="email" defaultValue={employee?.email} placeholder="john.doe@example.com" />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Role</FormLabel>
+            <Input defaultValue={employee?.role} placeholder="e.g., Property Manager" />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Status</FormLabel>
+            <Select defaultValue={employee?.status || 'Active'}>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </Select>
+          </FormControl>
+        </VStack>
+      </ModalBody>
+      <ModalFooter>
+        <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
+        <Button colorScheme="blue">{employee ? 'Save Changes' : 'Create Employee'}</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+);

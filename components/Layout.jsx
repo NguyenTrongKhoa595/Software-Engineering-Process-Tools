@@ -1,69 +1,40 @@
 import Head from 'next/head';
 import { Box } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-
 import Footer from './Footer';
-import Navbar from './NavbarLLPM';
-import NavbarTenant from './NavbarTenant';
+import Navbar from '../src/components/common/Navbar'; // The new unified navbar
 import NavbarGuest from './NavbarGuest';
+import { useAuth } from '../src/hooks/useAuth';
 
 export default function Layout({ children }) {
   const router = useRouter();
-  const [userRole, setUserRole] = useState(null);
+  const { isAuthenticated } = useAuth();
 
-  // pages you do NOT want navbar on
-  const hideNavbarRoutes = [
-    '/login',
-    '/register',
-    '/messages',
-    '/forgot-password'
-  ];
-
+  // Pages that should not have any navbar
+  const hideNavbarRoutes = ['/login', '/signup', '/forgot-password'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(router.pathname);
 
-  // Get user role from localStorage on mount
-  useEffect(() => {
-    const role = localStorage.getItem('role');
-    setUserRole(role);
-  }, []);
-
-  // Render appropriate navbar based on role
   const renderNavbar = () => {
     if (!shouldShowNavbar) return null;
 
-    // TEMPORARY: Force NavbarLLPM for testing on landlord routes
-    if (router.pathname.startsWith('/landlord')) {
-      return <Navbar />;
+    // The Home page has its own transparent guest navbar for the hero section
+    if (router.pathname === '/' && !isAuthenticated) {
+      return null;
     }
 
-    switch (userRole) {
-      case 'LANDLORD':
-      case 'PROPERTY_MANAGER':
-        return <Navbar />;
-      case 'TENANT':
-        return <NavbarTenant />;
-      default:
-        return <NavbarGuest />;
-    }
+    return isAuthenticated ? <Navbar /> : <NavbarGuest />;
   };
 
   return (
     <>
       <Head>
-        <title>Real Estate</title>
+        <title>RentMate - Your Perfect Home</title>
       </Head>
 
-      <Box maxWidth='1280px' m='auto'>
-        <header>
-          {renderNavbar()}
-        </header>
-
+      <Box>
+        <header>{renderNavbar()}</header>
         <main>{children}</main>
-
-        <footer>
-          <Footer />
-        </footer>
+        {/* The footer will be added to specific page layouts via PageContainer */}
       </Box>
     </>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -9,153 +9,139 @@ import {
   Input,
   IconButton,
   Divider,
-  useColorModeValue,
-  Badge,
-} from "@chakra-ui/react";
-import { FiSend } from "react-icons/fi";
+  Heading,
+  SkeletonCircle,
+  SkeletonText,
+} from '@chakra-ui/react';
+import { FiSend, FiSearch } from 'react-icons/fi';
+import useRequireAuth from '../src/hooks/useRequireAuth';
+import PageContainer from '../src/components/ui/PageContainer';
+import Card from '../src/components/ui/Card';
 
+// --- Mock Data ---
+const mockConversations = [
+  { id: 1, name: 'Olivia Rhye', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', lastMessage: 'Sure, I can be there at 3 PM.', timestamp: '2m ago' },
+  { id: 2, name: 'Phoenix Baker', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', lastMessage: 'Got it, thanks!', timestamp: '1h ago' },
+  { id: 3, name: 'Lana Steiner', avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100', lastMessage: 'Can you send over the documents?', timestamp: 'yesterday' },
+];
+
+const mockChat = [
+  { from: 'other', text: 'Hey! Is the apartment on 5th Ave still available?' },
+  { from: 'me', text: 'Hi there! Yes, it is. Are you interested in a tour?' },
+  { from: 'other', text: 'Definitely! When are you free?' },
+];
+
+// --- Skeleton Component ---
+const MessagesSkeleton = () => (
+  <Flex h="calc(100vh - 120px)" gap={4}>
+    <Card w={{ base: '100%', md: '350px' }} p={0} overflow="hidden">
+      <Box p={4}><SkeletonText noOfLines={1} w="120px" /></Box>
+      <Divider />
+      <VStack spacing={1} p={2}>
+        {[...Array(3)].map((_, i) => (
+          <HStack key={i} w="100%" p={3} spacing={3}>
+            <SkeletonCircle size="10" />
+            <VStack align="start" w="100%">
+              <Skeleton h="16px" w="80%" />
+              <Skeleton h="12px" w="60%" />
+            </VStack>
+          </HStack>
+        ))}
+      </VStack>
+    </Card>
+    <Card flex={1} display={{ base: 'none', md: 'flex' }} />
+  </Flex>
+);
+
+// --- Main Page Component ---
 export default function MessagesPage() {
-  const [selectedUser, setSelectedUser] = useState("John Doe");
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([
-    { from: "manager", text: "Hello John, how can I assist you today?" },
-    { from: "customer", text: "I’m interested in the apartment on Main St." },
-    { from: "manager", text: "Great choice! When would you like to visit?" },
-  ]);
+  const canRender = useRequireAuth();
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(1);
 
-  const users = [
-    { name: "John Doe", online: true },
-    { name: "Emily Chen", online: false },
-    { name: "David Nguyen", online: true },
-    { name: "Sophia Lee", online: false },
-  ];
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
 
-  const sendMessage = () => {
-    if (message.trim() === "") return;
-    setChat([...chat, { from: "manager", text: message }]);
-    setMessage("");
-  };
+  if (!canRender) return null;
 
   return (
-    <Flex height="92vh" p={3} mt={2} gap={3} >
-      {/* Sidebar */}
-      <Box
-        w="300px"
-        bg={useColorModeValue("white", "gray.800")}
-        shadow="sm"
-        borderRadius="xl"
-        overflow="hidden"
-      >
-        <Text fontWeight="bold" fontSize="xl" p={4}>
-          Messages
-        </Text>
+    <PageContainer maxW="1400px">
+      {loading ? <MessagesSkeleton /> : (
+        <Flex h="calc(100vh - 120px)" gap={4}>
+          {/* Conversation List */}
+          <Card w={{ base: '100%', md: '350px' }} p={0} overflow="hidden">
+            <Box p={4}><Heading size="md">Conversations</Heading></Box>
+            <Divider />
+            <VStack spacing={1} p={2} align="stretch">
+              {mockConversations.map(c => (
+                <ConversationItem key={c.id} conv={c} isActive={c.id === selectedId} onClick={() => setSelectedId(c.id)} />
+              ))}
+            </VStack>
+          </Card>
 
-        <Divider />
-
-        <VStack spacing={1} align="stretch" maxH="83vh" overflowY="auto" p={2}>
-          {users.map((u) => (
-            <HStack
-              key={u.name}
-              p={3}
-              borderRadius="lg"
-              cursor="pointer"
-              transition="0.2s"
-              bg={selectedUser === u.name ? "blue.50" : "transparent"}
-              _hover={{ bg: "blue.100" }}
-              onClick={() => setSelectedUser(u.name)}
-              spacing={3}
-            >
-              <Box position="relative">
-                <Avatar size="sm" name={u.name} />
-                {u.online && (
-                  <Badge
-                    position="absolute"
-                    bottom="0"
-                    right="0"
-                    bg="green.400"
-                    borderRadius="full"
-                    boxSize="10px"
-                  ></Badge>
-                )}
-              </Box>
-              <VStack align="start" spacing={0}>
-                <Text fontWeight="medium">{u.name}</Text>
-                <Text fontSize="xs" color="gray.500">
-                  {u.online ? "Online" : "Offline"}
-                </Text>
-              </VStack>
-            </HStack>
-          ))}
-        </VStack>
-      </Box>
-
-      {/* Chat Window */}
-      <Flex
-        flex="1"
-        direction="column"
-        bg={useColorModeValue("white", "gray.800")}
-        shadow="sm"
-        borderRadius="xl"
-      >
-        {/* Header */}
-        <HStack p={4} spacing={3} borderBottom="1px solid #e7e7e7">
-          <Avatar size="sm" name={selectedUser} />
-          <VStack align="start" spacing={0}>
-            <Text fontWeight="bold">{selectedUser}</Text>
-            <Text fontSize="xs" color="green.500">
-              Online
-            </Text>
-          </VStack>
-        </HStack>
-
-        {/* Messages */}
-        <VStack
-          flex="1"
-          p={5}
-          spacing={4}
-          overflowY="auto"
-          align="stretch"
-          bg={useColorModeValue("#f0f2f5", "gray.700")}
-        >
-          {chat.map((m, index) => (
-            <Flex key={index} justify={m.from === "manager" ? "flex-end" : "flex-start"}>
-              <Box
-                bg={m.from === "manager" ? "blue.500" : "gray.300"}
-                color={m.from === "manager" ? "white" : "black"}
-                px={4}
-                py={2}
-                borderRadius="2xl"
-                borderBottomRightRadius={m.from === "manager" ? "0" : "2xl"}
-                borderBottomLeftRadius={m.from !== "manager" ? "0" : "2xl"}
-                maxW="70%"
-                fontSize="sm"
-                shadow="md"
-              >
-                {m.text}
-              </Box>
-            </Flex>
-          ))}
-        </VStack>
-
-        {/* Message Input */}
-        <HStack p={4} borderTop="1px solid #e7e7e7" spacing={3}>
-          <Input
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            bg={useColorModeValue("white", "gray.600")}
-            borderRadius="full"
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          />
-          <IconButton
-            icon={<FiSend />}
-            colorScheme="blue"
-            borderRadius="full"
-            size="lg"
-            onClick={sendMessage}
-          />
-        </HStack>
-      </Flex>
-    </Flex>
+          {/* Chat Window */}
+          <Card flex={1} display={{ base: 'none', md: 'flex' }} flexDirection="column" p={0} overflow="hidden">
+            <ChatHeader name={mockConversations.find(c => c.id === selectedId)?.name} />
+            <VStack flex={1} p={6} spacing={4} overflowY="auto" bg="gray.50">
+              {mockChat.map((msg, i) => <MessageBubble key={i} from={msg.from} text={msg.text} />)}
+            </VStack>
+            <MessageInput />
+          </Card>
+        </Flex>
+      )}
+    </PageContainer>
   );
+}
+
+// --- Sub-components ---
+const ConversationItem = ({ conv, isActive, onClick }) => (
+  <HStack
+    p={3}
+    spacing={3}
+    borderRadius="lg"
+    cursor="pointer"
+    bg={isActive ? 'blue.50' : 'transparent'}
+    _hover={{ bg: 'gray.100' }}
+    onClick={onClick}
+  >
+    <Avatar name={conv.name} src={conv.avatarUrl} />
+    <VStack align="start" spacing={0} flex={1} overflow="hidden">
+      <HStack justify="space-between" w="100%">
+        <Text fontWeight="bold" noOfLines={1}>{conv.name}</Text>
+        <Text fontSize="xs" color="gray.500" whiteSpace="nowrap">{conv.timestamp}</Text>
+      </HStack>
+      <Text fontSize="sm" color="gray.500" noOfLines={1}>{conv.lastMessage}</Text>
+    </VStack>
+  </HStack>
+);
+
+const ChatHeader = ({ name }) => (
+  <HStack p={4} borderBottomWidth="1px">
+    <Heading size="sm">{name}</Heading>
+  </HStack>
+);
+
+const MessageBubble = ({ from, text }) => (
+  <Flex w="100%" justify={from === 'me' ? 'flex-end' : 'flex-start'}>
+    <Box
+      bg={from === 'me' ? 'blue.500' : 'gray.200'}
+      color={from === 'me' ? 'white' : 'black'}
+      px={4} py={2}
+      maxW="80%"
+      borderRadius="2xl"
+      borderBottomLeftRadius={from === 'other' ? 0 : '2xl'}
+      borderBottomRightRadius={from === 'me' ? 0 : '2xl'}
+    >
+      {text}
+    </Box>
+  </Flex>
+);
+
+const MessageInput = () => (
+  <HStack p={4} borderTopWidth="1px" bg="white">
+    <Input placeholder="Type a message..." size="lg" />
+    <IconButton icon={<FiSend />} colorScheme="blue" size="lg" aria-label="Send message" />
+  </HStack>
+);
 }

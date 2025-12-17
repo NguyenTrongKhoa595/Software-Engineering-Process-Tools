@@ -1,199 +1,94 @@
-import { Box, SimpleGrid, Flex, Text, Button } from "@chakra-ui/react";
-import { FaHome, FaUsers, FaTools, FaDollarSign } from "react-icons/fa";
-import { useRouter } from "next/router";
-import Property from "../../components/Property";
-import { mockProperties } from "../../utils/mockProperties";
+import {
+  Box,
+  SimpleGrid,
+  Flex,
+  Text,
+  Button,
+  Heading,
+  Icon,
+  VStack,
+  HStack,
+  Badge,
+} from '@chakra-ui/react';
+import useRequireAuth from '../../src/hooks/useRequireAuth';
+import { FaHome, FaUsers, FaTools, FaDollarSign } from 'react-icons/fa';
+import { useRouter } from 'next/router';
+import PageContainer from '../../src/components/ui/PageContainer';
+import Card from '../../src/components/ui/Card';
+import SectionHeader from '../../src/components/ui/SectionHeader';
 
+// --- Mock Data ---
 const dashboardStats = [
-  { label: "Properties", value: 12, icon: FaHome, color: "blue.500" },
-  { label: "Tenants", value: 38, icon: FaUsers, color: "green.500" },
-  { label: "Maintenance", value: 7, icon: FaTools, color: "orange.500" },
-  { label: "Revenue", value: "$24,300", icon: FaDollarSign, color: "purple.500" },
+  { label: 'Total Properties', value: 12, icon: FaHome, color: 'blue.500' },
+  { label: 'Active Tenants', value: 38, icon: FaUsers, color: 'green.500' },
+  { label: 'Open Requests', value: 7, icon: FaTools, color: 'orange.500' },
+  { label: 'Monthly Revenue', value: '$24,300', icon: FaDollarSign, color: 'purple.500' },
 ];
 
+const mockActivity = [
+  { type: 'payment', user: 'John Doe', amount: 1200, status: 'COMPLETED', date: '2025-12-01' },
+  { type: 'request', user: 'Jane Smith', issue: 'Leaking faucet', status: 'PENDING', date: '2025-11-28' },
+  { type: 'application', user: 'Ali Khan', property: 'Downtown Loft', status: 'APPROVED', date: '2025-11-25' },
+];
+
+// --- Sub-components ---
+const StatCard = ({ item }) => (
+  <Card p={6}>
+    <Flex align="center" justify="space-between">
+      <VStack align="start" spacing={1}>
+        <Text fontSize="md" color="gray.500">{item.label}</Text>
+        <Text fontSize="2xl" fontWeight="bold">{item.value}</Text>
+      </VStack>
+      <Icon as={item.icon} boxSize={8} color={item.color} />
+    </Flex>
+  </Card>
+);
+
+const ActivityItem = ({ item }) => (
+  <Flex justify="space-between" align="center" py={3}>
+    <VStack align="start" spacing={0}>
+      <Text fontWeight="medium">{item.user}</Text>
+      <Text fontSize="sm" color="gray.500">
+        {item.type === 'payment' && `Made a payment of $${item.amount}`}
+        {item.type === 'request' && `New request: ${item.issue}`}
+        {item.type === 'application' && `Applied for ${item.property}`}
+      </Text>
+    </VStack>
+    <Badge colorScheme={item.status === 'COMPLETED' || item.status === 'APPROVED' ? 'green' : 'orange'}>
+      {item.status}
+    </Badge>
+  </Flex>
+);
+
+// --- Main Page Component ---
 export default function LandlordDashboard() {
+  const canRender = useRequireAuth();
   const router = useRouter();
-  
+  if (!canRender) return null;
+
   return (
-    <>
-        <Box p="6">
-            <Text fontSize="3xl" fontWeight="bold" mb="6">
-            Landlord Dashboard
-            </Text>
+    <PageContainer>
+      <Heading as="h1" size="lg" mb={6}>Landlord Dashboard</Heading>
 
-            {/* Top Cards */}
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing="6" mb="10">
-            {dashboardStats.map((item) => (
-                <Flex
-                key={item.label}
-                p="6"
-                border="1px solid"
-                borderColor="gray.200"
-                rounded="lg"
-                boxShadow="sm"
-                bg="white"
-                align="center"
-                justify="space-between"
-                _hover={{ boxShadow: "md", transform: "scale(1.02)" }}
-                transition="0.2s ease"
-                >
-                <Box>
-                    <Text fontSize="lg" color="gray.600">{item.label}</Text>
-                    <Text fontSize="2xl" fontWeight="bold">{item.value}</Text>
-                </Box>
+      <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} spacing={6} mb={10}>
+        {dashboardStats.map((item) => (
+          <StatCard key={item.label} item={item} />
+        ))}
+      </SimpleGrid>
 
-                <Box fontSize="3xl" color={item.color}>
-                    <item.icon />
-                </Box>
-                </Flex>
-            ))}
-            </SimpleGrid>
-
-            {/* Featured Properties Section */}
-            <Flex align="center" justify="space-between" mt="6" mb="4">
-            <Text fontSize="2xl" fontWeight="bold">
-                Featured Properties
-            </Text>
-
-            <Text
-                fontSize="md"
-                color="blue.500"
-                fontWeight="medium"
-                cursor="pointer"
-                _hover={{ textDecoration: "underline" }}
-                onClick={() => router.push('/properties')}
-            >
-                View All &gt;
-            </Text>
-            </Flex>
-
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="6" justifyItems="center">
-            {mockProperties.map((property) => (
-                <Property key={property.id} property={property} />
-            ))}
-            </SimpleGrid>
-        </Box>
-
-        {/* Bottom Section: Payment History & Maintenance Requests */}
-        <Flex mt="10" gap="6" flexWrap="wrap">
-
-        {/* Payment History - Left Section */}
-        <Box
-            flex={{ base: "1 1 100%", md: "1 1 48%" }}
-            p="6"
-            border="1px solid"
-            borderColor="gray.200"
-            rounded="lg"
-            bg="white"
-            boxShadow="sm"
-        >
-            <Text fontSize="xl" fontWeight="bold" mb="4">
-            Payment History
-            </Text>
-
-            {/* Mock Payment Data */}
-            {[
-            { tenant: "John Doe", property: "Beautiful Family Home", amount: "$1200", date: "2025-12-01", status: "Paid" },
-            { tenant: "Jane Smith", property: "Luxury Villa with Pool", amount: "$2500", date: "2025-11-25", status: "Pending" },
-            { tenant: "Ali Khan", property: "Residential Plot in Prime Location", amount: "$800", date: "2025-11-20", status: "Paid" },
-            ].map((payment, index) => (
-            <Flex
-                key={index}
-                justify="space-between"
-                p="3"
-                mb="2"
-                bg={index % 2 === 0 ? "gray.50" : "white"}
-                rounded="md"
-                align="center"
-            >
-                <Box>
-                    <Text fontWeight="semibold">{payment.tenant}</Text>
-                    <Text fontSize="sm" color="gray.600">{payment.property}</Text>
-                </Box>
-
-                <Box textAlign="right">
-                    <Text fontWeight="bold">{payment.amount}</Text>
-                    <Text fontSize="sm" color="gray.500">{payment.date}</Text>
-                    <Text
-                        fontSize="sm"
-                        color={payment.status === "Paid" ? "green.500" : "orange.500"}
-                        fontWeight="semibold"
-                    >
-                        {payment.status}
-                    </Text>
-                </Box>
-            </Flex>
-            ))}
-            {/* View All Button */}
-            <Flex justify="flex-end" mt="4">
-            <Button size="sm" colorScheme="blue" variant="outline" onClick={() => router.push('/payments')}>
-                View All
-            </Button>
-            </Flex>
-        </Box>
-
-        {/* Maintenance Request - Right Section */}
-        <Box
-            flex={{ base: "1 1 100%", md: "1 1 48%" }}
-            p="6"
-            border="1px solid"
-            borderColor="gray.200"
-            rounded="lg"
-            bg="white"
-            boxShadow="sm"
-        >
-            <Text fontSize="xl" fontWeight="bold" mb="4">
-            Maintenance Requests
-            </Text>
-
-            {/* Mock Maintenance Data */}
-            {[
-                { tenant: "John Doe", property: "Beautiful Family Home", issue: "Leaking faucet", date: "2025-12-05", status: "In Progress" },
-                { tenant: "Jane Smith", property: "Luxury Villa with Pool", issue: "Air conditioning not working", date: "2025-12-03", status: "Completed" },
-                { tenant: "Ali Khan", property: "Residential Plot in Prime Location", issue: "Broken gate", date: "2025-12-01", status: "Pending" },
-            ].map((request, index) => (
-                <Flex
-                key={index}
-                justify="space-between"
-                p="3"
-                mb="2"
-                bg={index % 2 === 0 ? "gray.50" : "white"}
-                rounded="md"
-                align="center"
-                >
-                <Box>
-                    <Text fontWeight="semibold">{request.tenant}</Text>
-                    <Text fontSize="sm" color="gray.600">{request.property}</Text>
-                    <Text fontSize="sm" color="gray.700">{request.issue}</Text>
-                </Box>
-
-                <Box textAlign="right">
-                    <Text fontSize="sm" color="gray.500">{request.date}</Text>
-                    <Text
-                    fontSize="sm"
-                    color={
-                        request.status === "Completed"
-                        ? "green.500"
-                        : request.status === "In Progress"
-                        ? "orange.500"
-                        : "red.500"
-                    }
-                    fontWeight="semibold"
-                    >
-                    {request.status}
-                    </Text>
-                </Box>
-                </Flex>
-            ))}
-
-            {/* Optional button to view all requests */}
-            <Flex justify="flex-end" mt="4">
-                <Button size="sm" colorScheme="blue" variant="outline" onClick={() => router.push('/requests')}>
-                View All
-                </Button>
-            </Flex>
-        </Box>
+      <Card p={6}>
+        <SectionHeader title="Recent Activity" subtitle="Latest updates from your properties" center={false} mb={4} />
+        <VStack divider={<Box h="1px" bg="gray.200" />} spacing={0} align="stretch">
+          {mockActivity.map((item, index) => (
+            <ActivityItem key={index} item={item} />
+          ))}
+        </VStack>
+        <Flex justify="flex-end" mt={4}>
+          <Button size="sm" variant="outline" onClick={() => router.push('/activity')}>
+            View All Activity
+          </Button>
         </Flex>
-    </>
+      </Card>
+    </PageContainer>
   );
 }

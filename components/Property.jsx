@@ -1,86 +1,77 @@
-import { Image } from "@chakra-ui/react";
-import { Box, Flex, Text, Badge } from '@chakra-ui/layout';
+import { Image, Box, Flex, Text, Badge } from "@chakra-ui/react";
 import { FaMapMarkerAlt, FaTag } from "react-icons/fa";
 import Link from 'next/link';
-export default function Property({ property }) {
+import Card from '../src/components/ui/Card';
+
+export default function Property({ property = {} }) {
   const {
+    id,
     title,
     price,
     coverPhoto,
+    coverImageUrl,
     category,
+    address,
     location,
-    availability
+    availability,
+    status,
   } = property;
 
+  const imgUrl = coverImageUrl || coverPhoto?.url || '/placeholder-property.jpg';
+  const availText = (availability || status || 'AVAILABLE').toString().toLowerCase();
+  const isAvailable = availText.includes('available');
+
   return (
-    <Link href={`/property/${property.id}`} style={{ textDecoration: "none" }}>
-      <Box
-        border="1px solid"
-        borderColor="gray.200"
-        rounded="lg"
-        overflow="hidden"
-        bg="white"
-        boxShadow="sm"
-        _hover={{ boxShadow: "md", transform: "scale(1.02)" }}
-        transition="0.2s ease"
-        cursor="pointer"
-        width="400px"
-        m="3"
-      >
+    <Link href={`/property/${id}`} style={{ textDecoration: "none" }}>
+      <Card clickable overflow="hidden">
         {/* Image Section */}
         <Box position="relative">
-          <Image
-            src={coverPhoto?.url}
-            alt={title}
-            width="100%"
-            height="200px"
-            objectFit="cover"
-          />
-
-          {/* Availability Badge */}
+          <Image src={imgUrl} alt={title || 'Property'} w="100%" h="200px" objectFit="cover" />
           <Badge
             position="absolute"
             top="3"
             right="3"
-            colorScheme={availability === "available" ? "green" : "orange"}
+            colorScheme={isAvailable ? "green" : "orange"}
             px="3"
             py="1"
             rounded="md"
             fontWeight="600"
+            textTransform="capitalize"
           >
-            {availability}
+            {availText}
           </Badge>
         </Box>
 
         <Box p="4">
-
           {/* Title */}
-          <Text fontSize="lg" fontWeight="bold" mb="1">
-            {title}
+          <Text fontSize="lg" fontWeight="bold" noOfLines={1}>
+            {title || 'Untitled Property'}
           </Text>
 
           {/* Location */}
-          <Flex align="center" mb="1">
-            <FaMapMarkerAlt size={14} color="#4A5568" style={{ marginRight: "6px" }} />
-            <Text fontSize="sm" color="gray.600">
-              {location}
+          <Flex align="center" mt={1} gap={2}>
+            <FaMapMarkerAlt size={14} color="#4A5568" />
+            <Text fontSize="sm" color="gray.600" noOfLines={1}>
+              {address || location || 'Address not available'}
             </Text>
           </Flex>
 
-          {/* Property Type */}
-          <Flex align="center" mb="1">
-            <FaTag size={14} color="#4A5568" style={{ marginRight: "6px" }} />
-            <Text fontSize="sm" color="gray.600">
-              {category}
-            </Text>
-          </Flex>
+          {/* Category */}
+          {category && (
+            <Flex align="center" mt={1} gap={2}>
+              <FaTag size={14} color="#4A5568" />
+              <Text fontSize="sm" color="gray.600">{category}</Text>
+            </Flex>
+          )}
 
           {/* Price */}
-          <Text fontSize="xl" fontWeight="bold" mt="2">
-            ${price.toLocaleString()}
-          </Text>
+          {price != null && (
+            <Text fontSize="xl" fontWeight="bold" mt="3" color="blue.600">
+              ${Number(price).toLocaleString()}
+            </Text>
+          )}
         </Box>
-      </Box>
+      </Card>
     </Link>
   );
 }

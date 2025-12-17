@@ -9,14 +9,12 @@ import {
 //import { useRouter } from 'next/router';
 
 export default function NavbarGuest() {
-  //const router = useRouter();
-
   return (
     <Flex
       w="100%"
-      h="90px"
+      h="80px"
       align="center"
-      px={8}
+      px={{ base: 4, md: 8 }}
       position="absolute"
       top="0"
       left="0"
@@ -25,10 +23,18 @@ export default function NavbarGuest() {
       bg="transparent"
       border="none"
     >
+      {/* Left Brand */}
+      <HStack spacing={3} color="white">
+        <Box fontSize={{ base: 'lg', md: '2xl' }} fontWeight="bold">
+          RentMate
+        </Box>
+      </HStack>
+
       <Spacer />
 
-      {/* Empty right side - no buttons for guests */}
-      <HStack spacing={4}>
+      {/* Right actions (hidden for now, reserved for CTA) */}
+      <HStack spacing={3}>
+        {/* Placeholder for future guest actions */}
       </HStack>
     </Flex>
   );

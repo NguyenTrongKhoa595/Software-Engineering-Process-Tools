@@ -48,6 +48,66 @@ import HeaderLogo from "../../components/HeaderLogo";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
 
+// ✅ Mock documents data for landlord/manager view
+const mockLandlordDocuments = [
+  {
+    id: 1,
+    name: "Lease_Agreement_Unit_101_2025.pdf",
+    type: "PDF",
+    createdAt: "2025-01-05T09:00:00Z",
+    ownerName: "You (Landlord)",
+    lastModifiedRelative: "3 days ago",
+    modifiedAt: "2025-12-16T10:30:00Z",
+    modifiedBy: "You (Landlord)",
+    sizeBytes: 2621440, // 2.5 MB
+    location: "Property Documents > Leases",
+    sharedWith: [{ id: 1, name: "Tenant - Unit 101" }],
+    previewUrl: "", // optional
+  },
+  {
+    id: 2,
+    name: "Building_Insurance_2025.pdf",
+    type: "PDF",
+    createdAt: "2025-01-01T12:00:00Z",
+    ownerName: "You (Landlord)",
+    lastModifiedRelative: "2 weeks ago",
+    modifiedAt: "2025-12-03T15:00:00Z",
+    modifiedBy: "You (Landlord)",
+    sizeBytes: 1048576, // 1 MB
+    location: "Property Documents > Insurance",
+    sharedWith: [],
+  },
+  {
+    id: 3,
+    name: "Fire_Safety_Certificate.png",
+    type: "Image",
+    createdAt: "2025-02-10T14:15:00Z",
+    ownerName: "Property Manager",
+    lastModifiedRelative: "1 month ago",
+    modifiedAt: "2025-11-18T09:45:00Z",
+    modifiedBy: "Property Manager",
+    sizeBytes: 786432, // 768 KB
+    location: "Property Documents > Compliance",
+    sharedWith: [
+      { id: 2, name: "All Tenants" },
+      { id: 3, name: "Maintenance Team" },
+    ],
+  },
+  {
+    id: 4,
+    name: "Maintenance_Log_2025_Q1.xlsx",
+    type: "Spreadsheet",
+    createdAt: "2025-03-01T08:30:00Z",
+    ownerName: "Property Manager",
+    lastModifiedRelative: "5 days ago",
+    modifiedAt: "2025-12-14T11:20:00Z",
+    modifiedBy: "Property Manager",
+    sizeBytes: 524288, // 512 KB
+    location: "Property Documents > Maintenance",
+    sharedWith: [{ id: 4, name: "Owner" }],
+  },
+];
+
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
@@ -71,7 +131,11 @@ function formatSize(bytes) {
 
 export default function PropertyDocumentsPage() {
   const router = useRouter();
-  const { id: propertyId } = router.query;
+  // ⚠️ If you kept the query param pattern:
+  // const { propertyId } = router.query;
+  // If you are still using /property-documents?propertyId=123:
+  const { propertyId } = router.query;
+
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -84,18 +148,25 @@ export default function PropertyDocumentsPage() {
 
   // Fetch documents for this property
   useEffect(() => {
-    if (!propertyId) return;
+    if (!propertyId) return; // still wait for query to be ready
 
     const fetchDocs = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          `${API_BASE}/properties/${propertyId}/documents`
-        );
-        if (!res.ok) throw new Error("Failed to load documents");
-        const data = await res.json();
-        setDocs(data);
-        if (data.length > 0) setSelectedDoc(data[0]);
+        // ✅ Use mock data for now
+        setDocs(mockLandlordDocuments);
+        if (mockLandlordDocuments.length > 0) {
+          setSelectedDoc(mockLandlordDocuments[0]);
+        }
+
+        // ❌ Comment out real API until backend is ready
+        // const res = await fetch(
+        //   `${API_BASE}/properties/${propertyId}/documents`
+        // );
+        // if (!res.ok) throw new Error("Failed to load documents");
+        // const data = await res.json();
+        // setDocs(data);
+        // if (data.length > 0) setSelectedDoc(data[0]);
       } catch (e) {
         console.error(e);
         toast({
@@ -122,12 +193,20 @@ export default function PropertyDocumentsPage() {
     if (!file || !propertyId) return;
 
     // Validate file type - only PDF or images
-    const allowedTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"];
+    const allowedTypes = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+    ];
     if (!allowedTypes.includes(file.type)) {
       toast({
         status: "error",
         title: "Invalid file type",
-        description: "Only PDF and image files are allowed (PNG, JPG, GIF, WebP)",
+        description:
+          "Only PDF and image files are allowed (PNG, JPG, GIF, WebP)",
       });
       event.target.value = "";
       return;
@@ -135,35 +214,54 @@ export default function PropertyDocumentsPage() {
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      // For now, just simulate success by adding a fake entry using the file name
+      const fakeDoc = {
+        id: Date.now(),
+        name: file.name,
+        type: file.type.includes("pdf") ? "PDF" : "Image",
+        createdAt: new Date().toISOString(),
+        ownerName: "You (Landlord)",
+        lastModifiedRelative: "Just now",
+        modifiedAt: new Date().toISOString(),
+        modifiedBy: "You (Landlord)",
+        sizeBytes: file.size,
+        location: "Property Documents > Uploaded",
+        sharedWith: [],
+      };
+      setDocs((prev) => [...prev, fakeDoc]);
+      setSelectedDoc(fakeDoc);
+      toast({ status: "success", title: "Document uploaded (mock)" });
 
-      const res = await fetch(
-        `${API_BASE}/properties/${propertyId}/documents`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      if (!res.ok) throw new Error(await res.text());
-      const saved = await res.json();
-      setDocs((prev) => [...prev, saved]);
-      setSelectedDoc(saved);
-      toast({ status: "success", title: "Document uploaded" });
+      // ❌ Comment out real upload for now
+      // const formData = new FormData();
+      // formData.append("file", file);
+      // const res = await fetch(
+      //   `${API_BASE}/properties/${propertyId}/documents`,
+      //   {
+      //     method: "POST",
+      //     body: formData,
+      //   }
+      // );
+      // if (!res.ok) throw new Error(await res.text());
+      // const saved = await res.json();
+      // setDocs((prev) => [...prev, saved]);
+      // setSelectedDoc(saved);
+      // toast({ status: "success", title: "Document uploaded" });
     } catch (e) {
       console.error(e);
       toast({ status: "error", title: "Upload failed" });
     } finally {
       setUploading(false);
-      // reset input
       event.target.value = "";
     }
   };
 
   const handleDownload = (doc) => {
     if (!doc) return;
-    const link = typeof document !== 'undefined' && document.createElement("a");
+    const link =
+      typeof document !== "undefined" && document.createElement("a");
     if (link) {
+      // still point at API_BASE, but note this will 404 until backend is ready
       link.href = `${API_BASE}/documents/${doc.id}/download`;
       link.download = doc.name;
       link.click();
@@ -184,18 +282,33 @@ export default function PropertyDocumentsPage() {
   const handleShare = async () => {
     if (!selectedDoc || !shareEmail) return;
     try {
-      const res = await fetch(`${API_BASE}/documents/${selectedDoc.id}/share`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: shareEmail }),
-      });
-      if (!res.ok) throw new Error(await res.text());
+      // For now, just fake success and update local state
+      const updatedDoc = {
+        ...selectedDoc,
+        sharedWith: [
+          ...(selectedDoc.sharedWith || []),
+          { id: Date.now(), name: shareEmail },
+        ],
+      };
+      setDocs((prev) =>
+        prev.map((d) => (d.id === updatedDoc.id ? updatedDoc : d))
+      );
+      setSelectedDoc(updatedDoc);
+
       toast({
         status: "success",
-        title: "Access updated",
+        title: "Access updated (mock)",
         description: `Shared with ${shareEmail}`,
       });
       setIsAccessModalOpen(false);
+
+      // ❌ Comment out real API for now
+      // const res = await fetch(`${API_BASE}/documents/${selectedDoc.id}/share`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email: shareEmail }),
+      // });
+      // if (!res.ok) throw new Error(await res.text());
     } catch (e) {
       console.error(e);
       toast({
@@ -215,8 +328,7 @@ export default function PropertyDocumentsPage() {
 
   return (
     <Flex direction="column" minH="100vh" bg="gray.50">
-      <HeaderLogo />
-
+      
       {/* Main layout */}
       <Flex
         flex="1"
@@ -255,7 +367,8 @@ export default function PropertyDocumentsPage() {
                 leftIcon={<FiPlus />}
                 colorScheme="blue"
                 onClick={() =>
-                  typeof document !== 'undefined' && document.getElementById("upload-input")?.click()
+                  typeof document !== "undefined" &&
+                  document.getElementById("upload-input")?.click()
                 }
                 isLoading={uploading}
               >
@@ -379,30 +492,29 @@ export default function PropertyDocumentsPage() {
                 <Text fontSize="xs" fontWeight="semibold" mb={2}>
                   Who has access
                 </Text>
-                <HStack spacing={2} mb={3}>
+                <HStack spacing={2} mb={3} wrap="wrap">
                   {/* Owner */}
-                  <Avatar
-                    size="xs"
-                    name={selectedDoc.ownerName}
-                    bg="purple.500"
-                    color="white"
-                  />
-                  {/* Example: sharedWith list */}
-                  {(selectedDoc.sharedWith || []).slice(0, 3).map((u) => (
+                  <Tag size="sm" borderRadius="full" colorScheme="purple">
                     <Avatar
-                      key={u.id || u.name}
                       size="xs"
-                      name={u.name}
-                      bg="blue.500"
-                      color="white"
+                      name={selectedDoc.ownerName}
+                      mr={1}
                     />
+                    <TagLabel>{selectedDoc.ownerName} (Owner)</TagLabel>
+                  </Tag>
+                  {(selectedDoc.sharedWith || []).slice(0, 5).map((u) => (
+                    <Tag
+                      key={u.id || u.name}
+                      size="sm"
+                      borderRadius="full"
+                      colorScheme="blue"
+                    >
+                      <Avatar size="xs" name={u.name} mr={1} />
+                      <TagLabel>{u.name}</TagLabel>
+                    </Tag>
                   ))}
                 </HStack>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={openAccessModal}
-                >
+                <Button variant="outline" size="sm" onClick={openAccessModal}>
                   Manage access
                 </Button>
               </Box>
@@ -493,7 +605,11 @@ export default function PropertyDocumentsPage() {
                     Current access
                   </Text>
                   <HStack spacing={2} wrap="wrap">
-                    <Tag size="sm" borderRadius="full" colorScheme="purple">
+                    <Tag
+                      size="sm"
+                      borderRadius="full"
+                      colorScheme="purple"
+                    >
                       <Avatar
                         size="xs"
                         name={selectedDoc.ownerName}

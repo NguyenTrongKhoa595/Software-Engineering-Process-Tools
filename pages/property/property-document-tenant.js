@@ -30,7 +30,7 @@ import {
   FiFolder,
   FiX,
 } from "react-icons/fi";
-import HeaderLogo from "../../../components/HeaderLogo";
+import HeaderLogo from "../../components/HeaderLogo";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
@@ -48,9 +48,7 @@ const mockTenantDocuments = [
     modifiedBy: "Property Manager",
     sizeBytes: 2457600, // 2.4 MB
     location: "Property Documents > Leases",
-    sharedWith: [
-      { id: 1, name: "You (Tenant)" }
-    ]
+    sharedWith: [{ id: 1, name: "You (Tenant)" }],
   },
   {
     id: 2,
@@ -63,7 +61,7 @@ const mockTenantDocuments = [
     modifiedBy: "Property Manager",
     sizeBytes: 512000, // 500 KB
     location: "Property Documents > Checklists",
-    sharedWith: []
+    sharedWith: [],
   },
   {
     id: 3,
@@ -76,9 +74,7 @@ const mockTenantDocuments = [
     modifiedBy: "Landlord",
     sizeBytes: 358400, // 350 KB
     location: "Property Documents > Rules",
-    sharedWith: [
-      { id: 1, name: "All Tenants" }
-    ]
+    sharedWith: [{ id: 1, name: "All Tenants" }],
   },
   {
     id: 4,
@@ -91,7 +87,7 @@ const mockTenantDocuments = [
     modifiedBy: "Property Manager",
     sizeBytes: 204800, // 200 KB
     location: "Property Documents > Passes",
-    sharedWith: []
+    sharedWith: [],
   },
   {
     id: 5,
@@ -104,10 +100,8 @@ const mockTenantDocuments = [
     modifiedBy: "Landlord",
     sizeBytes: 2097152, // 2 MB
     location: "Property Documents > Plans",
-    sharedWith: [
-      { id: 1, name: "You (Tenant)" }
-    ]
-  }
+    sharedWith: [{ id: 1, name: "You (Tenant)" }],
+  },
 ];
 
 function formatDate(dateStr) {
@@ -133,7 +127,8 @@ function formatSize(bytes) {
 
 export default function TenantPropertyDocumentsPage() {
   const router = useRouter();
-  const { id: propertyId } = router.query;
+  // Get propertyId from query string instead of dynamic route segment
+  const { propertyId } = router.query;
   const toast = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -150,8 +145,9 @@ export default function TenantPropertyDocumentsPage() {
       try {
         // Use mock data for testing
         setDocs(mockTenantDocuments);
-        if (mockTenantDocuments.length > 0) setSelectedDoc(mockTenantDocuments[0]);
-        
+        if (mockTenantDocuments.length > 0)
+          setSelectedDoc(mockTenantDocuments[0]);
+
         // Uncomment to use real API
         // const res = await fetch(
         //   `${API_BASE}/properties/${propertyId}/documents`
@@ -183,7 +179,8 @@ export default function TenantPropertyDocumentsPage() {
 
   const handleDownload = (doc) => {
     if (!doc) return;
-    const link = typeof document !== 'undefined' && document.createElement("a");
+    const link =
+      typeof document !== "undefined" && document.createElement("a");
     if (link) {
       link.href = `${API_BASE}/documents/${doc.id}/download`;
       link.download = doc.name;
@@ -207,8 +204,6 @@ export default function TenantPropertyDocumentsPage() {
 
   return (
     <Flex direction="column" minH="100vh" bg="gray.50">
-      <HeaderLogo />
-
       {/* Main layout */}
       <Flex
         flex="1"

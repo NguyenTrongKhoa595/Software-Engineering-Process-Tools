@@ -48,34 +48,36 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        if (!id) return;
+    if (!id) return;
 
-        const loadProfile = async () => {
-            try {
-                setLoading(true);
-                const data = await apiGet(`/users/${id}`);
+    const loadProfile = async () => {
+        try {
+        setLoading(true);
+        const data = await apiGet(`/users/${id}`);
+        setUser(data);
+        setForm({
+            fullName: data.fullName || "",
+            email: data.email || "",
+            phoneNumber: data.phoneNumber || "",
+            password: ""
+        });
+        } catch (err) {
+        console.error("Failed to load profile:", err);
 
-                setUser(data);
-                setForm({
-                    fullName: data.fullName || "",
-                    email: data.email || "",
-                    phoneNumber: data.phoneNumber || "",
-                    password: ""
-                });
+        // If unauthorized, send to login
+        if (err.message.includes("401")) {
+            toast({ status: "error", title: "Session expired, please log in again" });
+            router.replace("/auth/login");
+        } else {
+            toast({ status: "error", title: "Failed to load profile" });
+        }
+        } finally {
+        setLoading(false);
+        }
+    };
 
-                if (data.landlord) setLinkedLandlord(data.landlord);
-                if (data.manager) setLinkedManager(data.manager);
-
-            } catch (err) {
-                console.error("Failed to load profile:", err);
-                toast({ status: "error", title: "Failed to load profile" });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadProfile();
-    }, [id, toast]);
+  loadProfile();
+}, [id, toast, router]);
 
     const handleSave = async () => {
         if (!id) return;
@@ -102,7 +104,7 @@ export default function ProfilePage() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("access_token");
         localStorage.removeItem("refreshToken");
         router.push("/login");
     };

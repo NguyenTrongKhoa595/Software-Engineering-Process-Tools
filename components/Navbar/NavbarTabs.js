@@ -1,7 +1,6 @@
 // NavbarTabs.js
 export const landlordTabs = [
   { label: "Employees", path: "/landlord/employees" },
-  { label: "Tenants", path: "/landlord/tenants" },
   {
     label: "Properties",
     children: [
@@ -16,7 +15,6 @@ export const landlordTabs = [
 ];
 
 export const tenantTabs = [
-  { label: "My Rental", path: "/tenant/properties" },
   { label: "Payments", path: "/payment/paymentsView" },
   {
     label: "Request Maintenance",

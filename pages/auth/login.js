@@ -43,7 +43,20 @@ function LoginPage() {
 
       const res = await login(email, password);
 
-      localStorage.setItem("access_token", res.accessToken);
+      // Try to extract token from different possible keys
+      const token =
+        res.accessToken ||
+        res.access_token ||
+        res.token ||
+        null;
+
+      if (!token) {
+        console.error("No token in login response", res);
+        setError("Login failed: no token received from server");
+        return;
+      }
+
+      localStorage.setItem("access_token", token);
       localStorage.setItem("user", JSON.stringify(res.user));
 
       router.push(

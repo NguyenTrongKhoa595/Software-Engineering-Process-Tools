@@ -4,7 +4,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8081/
 const buildHeaders = () => {
   const headers = { "Content-Type": "application/json" };
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("access_token");
     if (token) headers.Authorization = `Bearer ${token}`;
   }
   return headers;

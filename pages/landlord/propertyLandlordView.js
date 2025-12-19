@@ -35,7 +35,20 @@ export default function PropertiesPage() {
       const res = await fetch(`${API_BASE}/properties`);
       if (!res.ok) throw new Error("Failed to fetch properties");
       const data = await res.json();
-      setProperties(data);
+
+      let list;
+      if (Array.isArray(data)) {
+        list = data;
+      } else if (Array.isArray(data.content)) {
+        list = data.content;
+      } else if (Array.isArray(data.items)) {
+        list = data.items;
+      } else {
+        console.warn("Unexpected properties response shape:", data);
+        list = [];
+      }
+
+      setProperties(list);
     } catch (e) {
       console.error(e);
       toast({

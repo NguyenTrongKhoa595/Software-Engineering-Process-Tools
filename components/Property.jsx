@@ -1,5 +1,4 @@
-import { Image } from "@chakra-ui/react";
-import { Box, Flex, Text, Badge } from '@chakra-ui/layout';
+import { Box, Flex, Text, Badge, Image } from "@chakra-ui/react";
 import { FaMapMarkerAlt, FaTag } from "react-icons/fa";
 import Link from 'next/link';
 export default function Property({ property }) {

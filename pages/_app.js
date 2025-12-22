@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ChakraProvider } from '@chakra-ui/react';
+import theme from '../styles/theme';
 
 import Layout from '../components/Layout';
 import 'nprogress/nprogress.css';
@@ -30,7 +31,7 @@ function MyApp({ Component, pageProps }) {
     ((page) => <Layout>{page}</Layout>);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       {getLayout(<Component {...pageProps} />)}
     </ChakraProvider>
   );

@@ -29,8 +29,12 @@ export default function TenantNavbar() {
 
                 <MenuList>
                   {tab.children.map((child) => (
-                    <MenuItem key={child.label}>
-                      <Link href={child.path}>{child.label}</Link>
+                    <MenuItem
+                      key={child.label}
+                      as={Link}
+                      href={child.path}
+                    >
+                      {child.label}
                     </MenuItem>
                   ))}
                 </MenuList>
@@ -40,11 +44,15 @@ export default function TenantNavbar() {
 
           // 🔹 NORMAL TAB
           return (
-            <Link href={tab.path} key={tab.label} passHref>
-              <Box cursor="pointer" _hover={{ color: "blue.500" }}>
-                {tab.label}
-              </Box>
-            </Link>
+            <Box
+              key={tab.label}
+              as={Link}
+              href={tab.path}
+              cursor="pointer"
+              _hover={{ color: "blue.500" }}
+            >
+              {tab.label}
+            </Box>
           );
         })}
       </HStack>

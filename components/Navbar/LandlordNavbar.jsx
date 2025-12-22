@@ -5,14 +5,12 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem
+  MenuItem,
 } from "@chakra-ui/react";
 import NavbarBase from "./NavbarBase";
 import { landlordTabs } from "./NavbarTabs";
 
 export default function LandlordNavbar() {
-  if (typeof window === "undefined") return null;
-
   return (
     <NavbarBase>
       <HStack spacing="8" fontSize="lg" fontWeight="medium">
@@ -29,24 +27,28 @@ export default function LandlordNavbar() {
                 </MenuButton>
 
                 <MenuList>
-                  <Link href="/landlord/propertyLandlordView" passHref>
-                    <MenuItem>View Properties</MenuItem>
-                  </Link>
+                  <MenuItem as={Link} href="/landlord/propertyLandlordView">
+                    View Properties
+                  </MenuItem>
 
-                  <Link href="/landlord/propertyCreate" passHref>
-                    <MenuItem>Create Property</MenuItem>
-                  </Link>
+                  <MenuItem as={Link} href="/landlord/propertyCreate">
+                    Create Property
+                  </MenuItem>
                 </MenuList>
               </Menu>
             );
           }
 
           return (
-            <Link href={tab.path} key={tab.label}>
-              <Box cursor="pointer" _hover={{ color: "blue.500" }}>
-                {tab.label}
-              </Box>
-            </Link>
+            <Box
+              key={tab.label}
+              as={Link}
+              href={tab.path}
+              cursor="pointer"
+              _hover={{ color: "blue.500" }}
+            >
+              {tab.label}
+            </Box>
           );
         })}
       </HStack>

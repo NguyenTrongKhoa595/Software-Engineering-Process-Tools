@@ -1,10 +1,22 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'bayut-production.s3.eu-central-1.amazonaws.com',
-      'via.placeholder.com' ,  // 👈 add this
-      'www.hellolanding.com', // <--- add this for your new banner
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bayut-production.s3.eu-central-1.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.hellolanding.com',
+      },
     ],
   },
 };
+
+module.exports = nextConfig;

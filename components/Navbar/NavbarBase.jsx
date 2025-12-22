@@ -1,5 +1,14 @@
-import { Flex, Box, Spacer, HStack, IconButton } from '@chakra-ui/react';
-import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
+import {
+  Flex,
+  Box,
+  Spacer,
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
 import { FaUserCircle } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import NotificationDropdown from '../NotificationDropdown';
@@ -49,9 +58,11 @@ export default function NavbarBase({ children }) {
           <MenuList>
             <MenuItem
               onClick={() => {
-                if (typeof window === "undefined") return;
+                if (typeof window === "undefined") return; // optional safety, but harmless
+                const userRaw = window.localStorage.getItem("user");
+                if (!userRaw) return;
 
-                const user = JSON.parse(localStorage.getItem("user"));
+                const user = JSON.parse(userRaw);
                 if (!user?.id) return;
 
                 router.push(`/profile/${user.id}`);

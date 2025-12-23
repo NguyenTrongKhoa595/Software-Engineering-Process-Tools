@@ -14,6 +14,21 @@ export const landlordTabs = [
   { label: "Maintenance", path: "/maintenance" },
 ];
 
+export const propertyManagerTabs = [
+  { label: "Employees", path: "/landlord/employees" },
+  {
+    label: "Properties",
+    children: [
+      { label: "View Requests", path: "/landlord/propertyLandlordView" },
+      { label: "Create Request", path: "/landlord/propertyCreate" },
+    ],
+  },
+  { label: "Documents", path: "/property/select" },
+  { label: "Payments", path: "/payment/paymentsView" },
+  { label: "Communication", path: "/messages" },
+  { label: "Maintenance", path: "/maintenance" },
+];
+
 export const tenantTabs = [
   { label: "Payments", path: "/payment/paymentsView" },
   {

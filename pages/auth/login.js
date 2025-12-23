@@ -26,7 +26,7 @@ function LoginPage() {
 
     if (token && user?.role) {
       router.replace(
-        user.role === "LANDLORD" ? "/landlord" : "/tenant"
+        user.role === "LANDLORD" || user.role === "PROPERTY_MANAGER" ? "/landlord" : "/tenant"
       );
     }
   }, []);
@@ -60,7 +60,7 @@ function LoginPage() {
       localStorage.setItem("user", JSON.stringify(res.user));
 
       router.push(
-        res.user.role === "LANDLORD" ? "/landlord" : "/tenant"
+        res.user.role === "LANDLORD" || res.user.role === "PROPERTY_MANAGER" ? "/landlord" : "/tenant"
       );
     } catch (err) {
       console.error("LOGIN ERROR:", err);

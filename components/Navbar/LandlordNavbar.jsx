@@ -8,13 +8,14 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import NavbarBase from "./NavbarBase";
-import { landlordTabs } from "./NavbarTabs";
+import { landlordTabs, propertyManagerTabs } from "./NavbarTabs";
 
-export default function LandlordNavbar() {
+export default function LandlordNavbar({ role }) {
+  const tabs = role === "PROPERTY_MANAGER" ? propertyManagerTabs : landlordTabs;
   return (
     <NavbarBase>
       <HStack spacing="8" fontSize="lg" fontWeight="medium">
-        {landlordTabs.map((tab) => {
+        {tabs.map((tab) => {
           if (tab.label === "Properties") {
             return (
               <Menu key="Properties">

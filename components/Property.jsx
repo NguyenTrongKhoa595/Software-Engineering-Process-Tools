@@ -12,8 +12,8 @@ export default function Property({ property }) {
   } = property;
 
   return (
-    <Link href={`/propertyDetail?id=${property.id}`} style={{ textDecoration: "none" }}>
-      <Box
+    <Link href={`/propertyDetail?id=${property.id}`}>
+      <Box as="a"
         border="1px solid"
         borderColor="gray.200"
         rounded="lg"

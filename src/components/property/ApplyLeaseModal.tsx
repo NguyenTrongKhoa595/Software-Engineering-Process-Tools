@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { CalendarIcon, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import {
@@ -24,18 +23,37 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { createApplication, hasAppliedToProperty } from '@/lib/mockDatabase';
-import { Property } from '@/types/property';
+import { leaseApplicationApi } from '@/lib/api/leaseApplicationApi';
+import { ApiError } from '@/lib/api/client';
 import { toast } from 'sonner';
+
+interface ApplyLeaseProperty {
+  id: string | number;
+  title: string;
+  price: number;
+  thumbnail?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+  };
+}
 
 interface ApplyLeaseModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  property: Property;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
+  property: ApplyLeaseProperty;
+  onSuccess?: () => void;
 }
 
-export function ApplyLeaseModal({ open, onOpenChange, property }: ApplyLeaseModalProps) {
-  const navigate = useNavigate();
+export function ApplyLeaseModal({ open, onOpenChange, onClose, property, onSuccess }: ApplyLeaseModalProps) {
+  const handleClose = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose?.();
+    }
+    onOpenChange?.(isOpen);
+  };
   const { user } = useAuth();
   const [moveInDate, setMoveInDate] = useState<Date>();
   const [message, setMessage] = useState('');
@@ -43,8 +61,11 @@ export function ApplyLeaseModal({ open, onOpenChange, property }: ApplyLeaseModa
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (!user) return;
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error('Please log in to apply');
+      return;
+    }
     if (!moveInDate) {
       toast.error('Please select a preferred move-in date');
       return;
@@ -58,35 +79,32 @@ export function ApplyLeaseModal({ open, onOpenChange, property }: ApplyLeaseModa
       return;
     }
 
-    // Check if already applied
-    if (hasAppliedToProperty(user.id, property.id)) {
-      toast.error('You have already applied to this property');
-      return;
-    }
-
     setIsSubmitting(true);
 
-    const fullMessage = `Employment: ${employmentStatus}\n\n${message}`;
-    const application = createApplication(
-      user.id,
-      property.id,
-      moveInDate.toISOString(),
-      fullMessage
-    );
+    try {
+      const fullMessage = `Preferred move-in: ${format(moveInDate, 'PPP')}\nEmployment: ${employmentStatus}\n\n${message}`;
+      
+      await leaseApplicationApi.createApplication({
+        propertyId: Number(property.id),
+        message: fullMessage,
+      });
 
-    if (application) {
       toast.success('Application submitted successfully!');
-      onOpenChange(false);
-      navigate('/dashboard/applications');
-    } else {
-      toast.error('Failed to submit application');
+      handleClose(false);
+      onSuccess?.();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to submit application');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -102,7 +120,7 @@ export function ApplyLeaseModal({ open, onOpenChange, property }: ApplyLeaseModa
           {/* Property Info */}
           <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
             <img
-              src={property.thumbnail}
+              src={property.thumbnail || '/placeholder.svg'}
               alt={property.title}
               className="w-16 h-12 object-cover rounded"
             />
@@ -187,7 +205,7 @@ export function ApplyLeaseModal({ open, onOpenChange, property }: ApplyLeaseModa
         </div>
 
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+          <Button variant="outline" onClick={() => handleClose(false)} className="flex-1">
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">

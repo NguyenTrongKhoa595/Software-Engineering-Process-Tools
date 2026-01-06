@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Home, Search, Info, Phone, HelpCircle, LogIn, UserPlus, LayoutDashboard, LogOut, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRealtime } from '@/contexts/RealtimeContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -13,12 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getNotifications, markNotificationAsRead, getUnreadNotificationCount } from '@/lib/mockDatabase';
-import { Notification } from '@/types/tenant';
+import { Notification } from '@/lib/api/notificationsApi';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
-
+import { getRoleAwareNotificationLink } from '@/lib/utils/notificationLinks';
 const navLinks = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/properties', label: 'Browse Properties', icon: Search },
@@ -29,18 +29,10 @@ const navLinks = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      setNotifications(getNotifications(user.id).slice(0, 5));
-      setUnreadCount(getUnreadNotificationCount(user.id));
-    }
-  }, [user, location.pathname]);
+  const { notifications, unreadCount, markAsRead } = useRealtime();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -54,15 +46,12 @@ export function Header() {
     return user.fullName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
   };
 
-  const handleNotificationClick = (notification: Notification) => {
-    if (!user) return;
+  const handleNotificationClick = async (notification: Notification) => {
     if (!notification.read) {
-      markNotificationAsRead(user.id, notification.id);
-      setNotifications(getNotifications(user.id).slice(0, 5));
-      setUnreadCount(getUnreadNotificationCount(user.id));
+      await markAsRead(notification.id);
     }
-    if (notification.link) {
-      navigate(notification.link);
+    if (notification.link && user?.role) {
+      navigate(getRoleAwareNotificationLink(notification.link, notification.type, user.role));
     }
   };
 

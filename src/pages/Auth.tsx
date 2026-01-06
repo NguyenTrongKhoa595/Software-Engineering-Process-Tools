@@ -16,10 +16,10 @@ export default function Auth() {
   const { login, signup, isAuthenticated, isLoading } = useAuth();
 
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
-  const initialRole = searchParams.get("role") as "TENANT" | "LANDLORD" | null;
+  const initialRole = searchParams.get("role") as "TENANT" | "LANDLORD" | "PROPERTY_MANAGER" | null;
 
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
-  const [role, setRole] = useState<"TENANT" | "LANDLORD">(initialRole || "TENANT");
+  const [role, setRole] = useState<"TENANT" | "LANDLORD" | "PROPERTY_MANAGER">(initialRole || "TENANT");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +44,9 @@ export default function Auth() {
     setError(null);
     setIsSubmitting(true);
 
+    // Regex: At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
     try {
       if (mode === "signup") {
         if (formData.password !== formData.confirmPassword) {
@@ -51,11 +54,17 @@ export default function Auth() {
           setIsSubmitting(false);
           return;
         }
-        if (formData.password.length < 6) {
-          setError("Password must be at least 6 characters");
+
+        // --- NEW VALIDATION LOGIC START ---
+        if (!passwordRegex.test(formData.password)) {
+          setError(
+            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+          );
           setIsSubmitting(false);
           return;
         }
+        // --- NEW VALIDATION LOGIC END ---
+
         if (!formData.agreeToTerms) {
           setError("Please agree to the Terms of Service");
           setIsSubmitting(false);
@@ -147,12 +156,12 @@ export default function Auth() {
                 {mode === "signup" && (
                   <div className="space-y-2">
                     <Label>I am a</Label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <button
                         type="button"
                         onClick={() => setRole("TENANT")}
                         className={cn(
-                          "flex items-center gap-3 p-4 rounded-xl border-2 transition-all",
+                          "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
                           role === "TENANT" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
                         )}
                       >
@@ -164,8 +173,8 @@ export default function Auth() {
                         >
                           <Users className="h-5 w-5" />
                         </div>
-                        <div className="text-left">
-                          <div className="font-medium">Tenant</div>
+                        <div className="text-center">
+                          <div className="font-medium text-sm">Tenant</div>
                           <div className="text-xs text-muted-foreground">Looking to rent</div>
                         </div>
                       </button>
@@ -173,7 +182,7 @@ export default function Auth() {
                         type="button"
                         onClick={() => setRole("LANDLORD")}
                         className={cn(
-                          "flex items-center gap-3 p-4 rounded-xl border-2 transition-all",
+                          "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
                           role === "LANDLORD" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
                         )}
                       >
@@ -185,9 +194,30 @@ export default function Auth() {
                         >
                           <Building className="h-5 w-5" />
                         </div>
-                        <div className="text-left">
-                          <div className="font-medium">Landlord</div>
+                        <div className="text-center">
+                          <div className="font-medium text-sm">Landlord</div>
                           <div className="text-xs text-muted-foreground">Listing property</div>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole("PROPERTY_MANAGER")}
+                        className={cn(
+                          "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                          role === "PROPERTY_MANAGER" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "p-2 rounded-lg",
+                            role === "PROPERTY_MANAGER" ? "bg-primary text-primary-foreground" : "bg-muted",
+                          )}
+                        >
+                          <KeyRound className="h-5 w-5" />
+                        </div>
+                        <div className="text-center">
+                          <div className="font-medium text-sm">Manager</div>
+                          <div className="text-xs text-muted-foreground">Managing properties</div>
                         </div>
                       </button>
                     </div>

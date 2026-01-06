@@ -72,7 +72,7 @@ export async function apiClient<T>(
 
     // Handle error responses
     if (!response.ok) {
-      // Extract error message from various possible response formats
+      // Extract error message from backend response
       let errorMessage = 'An error occurred';
       
       if (typeof data === 'object' && data !== null) {
@@ -131,4 +131,31 @@ export const api = {
 
   delete: <T>(endpoint: string, options?: RequestInit) =>
     apiClient<T>(endpoint, { ...options, method: 'DELETE' }),
+
+  upload: async <T>(endpoint: string, formData: FormData): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const token = getAuthToken();
+
+    const headers: HeadersInit = {
+      'ngrok-skip-browser-warning': 'true',
+    };
+
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      const errorMessage = data?.message || data?.error || `Error ${response.status}`;
+      throw new ApiError(errorMessage, response.status, data);
+    }
+
+    return response.json();
+  },
 };

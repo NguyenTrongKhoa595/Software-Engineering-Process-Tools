@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Building2, FileText, ScrollText, MessageSquare } from 'lucide-react';
+import { Building2, FileText, ScrollText, MessageSquare, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLandlordProperties, getApplicationsForLandlord, getLeaseAgreements } from '@/lib/mockDatabase';
 import { conversationsApi } from '@/lib/api/conversationsApi';
-import { Property } from '@/types/property';
-import { Application } from '@/types/tenant';
-import { LeaseAgreement } from '@/types/landlord';
+import { propertyApi } from '@/lib/api/propertyApi';
+import { leaseApi } from '@/lib/api/leaseApi';
+import { leaseApplicationApi } from '@/lib/api/leaseApplicationApi';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { format, parseISO } from 'date-fns';
 
 interface StatsCardProps {
   title: string;
@@ -17,9 +18,10 @@ interface StatsCardProps {
   description: string;
   icon: React.ElementType;
   trend?: string;
+  isLoading?: boolean;
 }
 
-function StatsCard({ title, value, description, icon: Icon, trend }: StatsCardProps) {
+function StatsCard({ title, value, description, icon: Icon, trend, isLoading }: StatsCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -27,7 +29,11 @@ function StatsCard({ title, value, description, icon: Icon, trend }: StatsCardPr
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        {isLoading ? (
+           <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+        ) : (
+          <div className="text-2xl font-bold">{value}</div>
+        )}
         <p className="text-xs text-muted-foreground">
           {description}
           {trend && <span className="text-green-500 ml-1">{trend}</span>}
@@ -40,27 +46,51 @@ function StatsCard({ title, value, description, icon: Icon, trend }: StatsCardPr
 export default function LandlordDashboardHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [leases, setLeases] = useState<LeaseAgreement[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  useEffect(() => {
-    if (user) {
-      setProperties(getLandlordProperties(user.id));
-      setApplications(getApplicationsForLandlord(user.id));
-      setLeases(getLeaseAgreements(user.id));
-      
-      // Fetch unread count from API
-      conversationsApi.getUnreadCount()
-        .then(response => setUnreadMessages(response.unreadCount))
-        .catch(err => console.error('Failed to fetch unread count:', err));
-    }
-  }, [user]);
+  // 1. Fetch Properties (needed first to get applications)
+  const { data: properties, isLoading: isLoadingProperties } = useQuery({
+    queryKey: ['landlord-properties', user?.id],
+    queryFn: () => propertyApi.getPropertiesByLandlord(Number(user?.id)),
+    enabled: !!user?.id,
+  });
 
-  const pendingApplications = applications.filter(app => app.status === 'pending' || app.status === 'under_review');
-  const activeLeases = leases.filter(lease => lease.status === 'active');
-  const availableProperties = properties.filter(prop => prop.status === 'available');
+  // 2. Fetch Leases
+  const { data: leases, isLoading: isLoadingLeases } = useQuery({
+    queryKey: ['landlord-leases'],
+    queryFn: () => leaseApi.getLeasesForLandlord(),
+    enabled: !!user?.id,
+  });
+
+  // 3. Fetch Applications (Aggregate from all properties)
+  const { data: applications, isLoading: isLoadingApplications } = useQuery({
+    queryKey: ['landlord-applications-aggregated', properties?.map(p => p.id)],
+    queryFn: async () => {
+      if (!properties || properties.length === 0) return [];
+      const promises = properties.map(p => 
+        leaseApplicationApi.getApplicationsForProperty(p.id)
+          .catch(() => []) // Handle error per property gracefully
+      );
+      const results = await Promise.all(promises);
+      return results.flat().sort((a, b) => 
+        new Date(b.applicationDate).getTime() - new Date(a.applicationDate).getTime()
+      );
+    },
+    enabled: !!properties && properties.length > 0,
+  });
+
+  useEffect(() => {
+     // Fetch unread count
+     conversationsApi.getUnreadCount()
+       .then(response => setUnreadMessages(response.unreadCount))
+       .catch(err => console.error('Failed to fetch unread count:', err));
+  }, []);
+
+  const pendingApplications = applications?.filter(app => app.status === 'PENDING') || [];
+  const activeLeases = leases?.filter(lease => lease.status === 'ACTIVE') || [];
+  const availableProperties = properties?.filter(prop => prop.status === 'AVAILABLE') || [];
+
+  const isLoading = isLoadingProperties || isLoadingLeases;
 
   return (
     <div className="space-y-6">
@@ -75,21 +105,24 @@ export default function LandlordDashboardHome() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Properties"
-          value={properties.length}
+          value={properties?.length || 0}
           description={`${availableProperties.length} available`}
           icon={Building2}
+          isLoading={isLoadingProperties}
         />
         <StatsCard
           title="Pending Applications"
           value={pendingApplications.length}
           description="Awaiting your review"
           icon={FileText}
+          isLoading={isLoadingApplications}
         />
         <StatsCard
           title="Active Leases"
           value={activeLeases.length}
           description="Current tenants"
           icon={ScrollText}
+          isLoading={isLoadingLeases}
         />
         <StatsCard
           title="Unread Messages"
@@ -111,7 +144,9 @@ export default function LandlordDashboardHome() {
             <CardDescription>Applications awaiting your review</CardDescription>
           </CardHeader>
           <CardContent>
-            {pendingApplications.length === 0 ? (
+            {isLoadingApplications ? (
+              <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
+            ) : pendingApplications.length === 0 ? (
               <p className="text-sm text-muted-foreground">No pending applications</p>
             ) : (
               <div className="space-y-3">
@@ -120,10 +155,10 @@ export default function LandlordDashboardHome() {
                     <div>
                       <p className="font-medium text-sm">{app.property.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        Applied {new Date(app.appliedAt).toLocaleDateString()}
+                        Applied {format(parseISO(app.applicationDate), 'MMM d, yyyy')}
                       </p>
                     </div>
-                    <Badge variant={app.status === 'pending' ? 'secondary' : 'outline'}>
+                    <Badge variant={app.status === 'PENDING' ? 'secondary' : 'outline'}>
                       {app.status.replace('_', ' ')}
                     </Badge>
                   </div>
@@ -132,7 +167,7 @@ export default function LandlordDashboardHome() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate('/dashboard/applications')}
+                    onClick={() => navigate('/dashboard/applications')} // Note: This route might list apps by property or generic list
                   >
                     View All Applications
                   </Button>
@@ -152,7 +187,9 @@ export default function LandlordDashboardHome() {
             <CardDescription>Quick overview of your listings</CardDescription>
           </CardHeader>
           <CardContent>
-            {properties.length === 0 ? (
+             {isLoadingProperties ? (
+              <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
+            ) : !properties || properties.length === 0 ? (
               <div className="text-center py-4">
                 <p className="text-sm text-muted-foreground mb-3">No properties listed yet</p>
                 <Button onClick={() => navigate('/dashboard/properties')}>
@@ -165,20 +202,20 @@ export default function LandlordDashboardHome() {
                   <div key={property.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <img 
-                        src={property.thumbnail} 
+                        src={property.coverImageUrl || property.thumbnail || '/placeholder.svg'} 
                         alt={property.title}
                         className="h-10 w-10 rounded object-cover"
                       />
                       <div>
                         <p className="font-medium text-sm truncate max-w-[180px]">{property.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          ${property.price}/mo
+                          ${property.rentAmount}/mo
                         </p>
                       </div>
                     </div>
                     <Badge variant={
-                      property.status === 'available' ? 'default' : 
-                      property.status === 'rented' ? 'secondary' : 'outline'
+                      property.status === 'AVAILABLE' ? 'default' : 
+                      property.status === 'RENTED' ? 'secondary' : 'outline'
                     }>
                       {property.status}
                     </Badge>
@@ -188,7 +225,7 @@ export default function LandlordDashboardHome() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate('/dashboard/properties')}
+                    onClick={() => navigate('/dashboard/landlord/properties')}
                   >
                     View All Properties
                   </Button>

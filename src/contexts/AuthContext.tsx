@@ -2,23 +2,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { UserRole } from '@/types/user';
 import { authApi, NormalizedUser, ApiError } from '@/lib/api/authApi';
 import { userApi } from '@/lib/api/userApi';
-import { USER_KEY } from '@/lib/api/config';
+import { USER_KEY, TOKEN_KEY } from '@/lib/api/config';
+import { setOnUnauthorized } from '@/lib/api/client';
 
-// Auth context for managing user authentication state
-
-// Re-export the user type from authApi for consistency
+// ... (existing helper types)
 export type AuthUser = NormalizedUser;
 
 interface AuthContextType {
-  user: AuthUser | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string, confirmNewPassword: string) => Promise<{ success: boolean; error?: string }>;
-  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
-  refreshUser: () => Promise<void>;
+// ... (existing interface)
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,8 +18,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session on mount
+  // Restore session on mount and setup interceptors
   useEffect(() => {
+    // Register 401 handler
+    setOnUnauthorized(() => {
+      // Clear local storage and state immediately
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      setUser(null);
+    });
+
     const storedUser = authApi.getStoredUser();
     if (storedUser && authApi.isAuthenticated()) {
       setUser(storedUser);

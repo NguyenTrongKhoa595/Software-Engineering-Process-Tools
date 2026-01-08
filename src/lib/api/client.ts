@@ -13,6 +13,13 @@ export class ApiError extends Error {
   }
 }
 
+// Handler for 401 Unauthorized responses
+let onUnauthorized: () => void = () => {};
+
+export const setOnUnauthorized = (callback: () => void) => {
+  onUnauthorized = callback;
+};
+
 // Get stored auth token
 export const getAuthToken = (): string | null => {
   return localStorage.getItem(TOKEN_KEY);
@@ -72,6 +79,10 @@ export async function apiClient<T>(
 
     // Handle error responses
     if (!response.ok) {
+      if (response.status === 401) {
+        onUnauthorized();
+      }
+
       // Extract error message from backend response
       let errorMessage = 'An error occurred';
       
@@ -151,6 +162,10 @@ export const api = {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        onUnauthorized();
+      }
+
       const data = await response.json().catch(() => ({}));
       const errorMessage = data?.message || data?.error || `Error ${response.status}`;
       throw new ApiError(errorMessage, response.status, data);

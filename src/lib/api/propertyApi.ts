@@ -1,5 +1,5 @@
-import { API_BASE_URL } from './config';
-import { getAuthToken } from './client';
+import { API_BASE_URL, API_ENDPOINTS } from './config';
+import { getAuthToken, api } from './client';
 
 // Types based on API documentation
 export interface PropertyPhoto {
@@ -46,6 +46,8 @@ export interface PropertyResponseDTO {
   coverImageUrl: string | null;
   thumbnail: string | null;
   landlord: PropertyLandlord;
+  manager?: PropertyLandlord;
+  managerId: number | null;
   rating: number;
   reviewsCount: number;
   availableFrom: string | null;
@@ -206,22 +208,9 @@ export const propertyApi = {
     return response.json();
   },
 
-  // Get single property (public)
+  // Get single property (public/authenticated)
   getProperty: async (propertyId: number): Promise<PropertyResponseDTO> => {
-    const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Failed to fetch property');
-    }
-    
-    return response.json();
+    return api.get<PropertyResponseDTO>(API_ENDPOINTS.PROPERTY_DETAIL(propertyId));
   },
 
   // Get featured properties (public)

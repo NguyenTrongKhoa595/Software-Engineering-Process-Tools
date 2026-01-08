@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   USER_PUBLIC_PROFILE: (userId: number) => `/api/users/${userId}`,
   USER_ME: "/api/users/me",
   USER_UNLINK_ID_DOCUMENT: "/api/users/me/identity-document",
+  USERS_SEARCH: "/api/users/search",
 
   // Files
   FILES_UPLOAD: "/api/files/upload",

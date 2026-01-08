@@ -17,6 +17,11 @@ export interface UpdateProfileRequest {
   bio?: string;
 }
 
+export interface UserSearchParams {
+  role?: "TENANT" | "LANDLORD" | "PROPERTY_MANAGER" | "ADMIN";
+  email?: string;
+}
+
 // User API service
 export const userApi = {
   // Get public user profile (no auth required)
@@ -47,5 +52,19 @@ export const userApi = {
   // Update current user's profile (auth required)
   updateProfile: async (data: UpdateProfileRequest): Promise<void> => {
     return api.put(API_ENDPOINTS.USER_ME, data);
+  },
+
+  // Search users (Landlord/Admin only)
+  searchUsers: async (params: UserSearchParams): Promise<UserProfile[]> => {
+    const searchParams = new URLSearchParams();
+    if (params.role) searchParams.append("role", params.role);
+    if (params.email) searchParams.append("email", params.email);
+
+    return api.get<UserProfile[]>(`${API_ENDPOINTS.USERS_SEARCH}?${searchParams.toString()}`);
+  },
+
+  // Get landlord's managers
+  getMyManagers: async (): Promise<UserProfile[]> => {
+    return api.get<UserProfile[]>("/api/users/me/my-managers");
   },
 };

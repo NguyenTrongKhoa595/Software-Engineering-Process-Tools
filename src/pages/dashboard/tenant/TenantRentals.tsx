@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 import {
   Building2,
   Calendar,
@@ -8,44 +9,54 @@ import {
   MessageSquare,
   Wrench,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { mockRentals } from '@/data/mockTenant';
-import { Rental } from '@/types/tenant';
+import { leaseApi, LeaseResponseDTO } from '@/lib/api/leaseApi';
 
-const statusStyles = {
-  active: 'bg-accent text-accent-foreground',
-  past: 'bg-muted text-muted-foreground',
-  upcoming: 'bg-primary text-primary-foreground',
+const statusStyles: Record<string, string> = {
+  ACTIVE: 'bg-accent text-accent-foreground',
+  TERMINATED: 'bg-muted text-muted-foreground',
+  EXPIRED: 'bg-muted text-muted-foreground',
+  PENDING: 'bg-primary text-primary-foreground',
+  AWAITING_PAYMENT: 'bg-blue-500 text-white',
 };
 
-function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean }) {
+function RentalCard({ rental, isActive }: { rental: LeaseResponseDTO; isActive: boolean }) {
+  // Determine display status
+  const displayStatus = rental.status === 'ACTIVE' 
+    ? 'Active' 
+    : rental.status === 'TERMINATED' 
+      ? 'Terminated' 
+      : rental.status === 'EXPIRED'
+        ? 'Past'
+        : rental.status.replace('_', ' ');
+
   return (
     <Card className={isActive ? 'border-primary/50' : ''}>
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <img
-            src={rental.property.thumbnail}
-            alt={rental.property.title}
+            src={rental.propertyCoverImageUrl || '/placeholder.svg'}
+            alt={rental.propertyTitle}
             className="w-full lg:w-64 h-48 object-cover rounded-lg"
           />
           <div className="flex-1 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge className={statusStyles[rental.status]}>
-                    {rental.status.charAt(0).toUpperCase() + rental.status.slice(1)}
+                  <Badge className={statusStyles[rental.status] || 'bg-gray-500'}>
+                    {displayStatus}
                   </Badge>
                 </div>
-                <h3 className="text-xl font-semibold">{rental.property.title}</h3>
+                <h3 className="text-xl font-semibold">{rental.propertyTitle}</h3>
                 <p className="text-muted-foreground flex items-center gap-1 mt-1">
                   <MapPin className="h-4 w-4" />
-                  {rental.property.address.street}, {rental.property.address.city},{' '}
-                  {rental.property.address.state}
+                  {rental.propertyAddress}
                 </p>
               </div>
               <Link to={`/properties/${rental.propertyId}`}>
@@ -59,7 +70,7 @@ function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean })
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Monthly Rent</p>
-                <p className="font-semibold">${rental.monthlyRent.toLocaleString()}</p>
+                <p className="font-semibold">${rental.rentAmount.toLocaleString()}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Security Deposit</p>
@@ -67,11 +78,11 @@ function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean })
               </div>
               <div>
                 <p className="text-muted-foreground">Lease Start</p>
-                <p className="font-semibold">{format(parseISO(rental.leaseStart), 'MMM d, yyyy')}</p>
+                <p className="font-semibold">{format(parseISO(rental.startDate), 'MMM d, yyyy')}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Lease End</p>
-                <p className="font-semibold">{format(parseISO(rental.leaseEnd), 'MMM d, yyyy')}</p>
+                <p className="font-semibold">{format(parseISO(rental.endDate), 'MMM d, yyyy')}</p>
               </div>
             </div>
 
@@ -80,13 +91,12 @@ function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean })
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={rental.property.landlord.avatar} />
                   <AvatarFallback>
-                    {rental.property.landlord.name[0]}
+                    {rental.landlordName?.[0] || 'L'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{rental.property.landlord.name}</p>
+                  <p className="font-medium">{rental.landlordName}</p>
                   <p className="text-xs text-muted-foreground">Landlord</p>
                 </div>
               </div>
@@ -104,7 +114,7 @@ function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean })
                       Maintenance
                     </Button>
                   </Link>
-                  <Link to="/dashboard/messages">
+                  <Link to={`/dashboard/messages/${rental.landlordId}`}>
                     <Button variant="outline" size="sm">
                       <MessageSquare className="h-4 w-4 mr-1" />
                       Message
@@ -121,8 +131,21 @@ function RentalCard({ rental, isActive }: { rental: Rental; isActive: boolean })
 }
 
 export default function Rentals() {
-  const activeRentals = mockRentals.filter((r) => r.status === 'active');
-  const pastRentals = mockRentals.filter((r) => r.status === 'past');
+  const { data: leases, isLoading } = useQuery({
+    queryKey: ['my-rentals'],
+    queryFn: () => leaseApi.getMyLeases(),
+  });
+
+  const activeRentals = leases?.filter((r) => r.status === 'ACTIVE') || [];
+  const pastRentals = leases?.filter((r) => r.status === 'EXPIRED' || r.status === 'TERMINATED') || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Country, State } from 'country-state-city';
 import { Search, SlidersHorizontal, Grid3X3, List, Heart, MapPin, Bed, Bath, Square, X, Loader2, Calendar, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { propertyApi, PropertySummaryDTO, PropertySearchParams } from '@/lib/api/propertyApi';
 import { savedPropertiesApi } from '@/lib/api/savedPropertiesApi';
+import { LocationSelector } from '@/components/property/LocationSelector';
 
 const PROPERTY_TYPE_OPTIONS = [
   { value: 'APARTMENT', label: 'Apartment' },
@@ -41,6 +43,8 @@ interface FilterState {
   petFriendly: boolean | null;
   selectedAmenities: string[];
   city: string;
+  state: string;
+  country: string;
   availableFrom: Date | undefined;
 }
 
@@ -54,6 +58,8 @@ const DEFAULT_FILTERS: FilterState = {
   petFriendly: null,
   selectedAmenities: [],
   city: '',
+  state: '',
+  country: 'VN',
   availableFrom: undefined,
 };
 
@@ -145,9 +151,20 @@ export default function Properties() {
         params.amenities = appliedFilters.selectedAmenities.join(',');
       }
       
-      // Add city filter
+      // Add location filters
       if (appliedFilters.city) {
         params.city = appliedFilters.city;
+      } else if (appliedFilters.state) {
+        const stateName = State.getStateByCodeAndCountry(appliedFilters.state, appliedFilters.country)?.name;
+        if (stateName) {
+           params.search = searchQuery ? `${searchQuery} ${stateName}` : stateName;
+        }
+      } else if (appliedFilters.country && appliedFilters.country !== 'VN') {
+         // Only search by country if it's not the default (VN) to avoid noise
+         const countryName = Country.getCountryByCode(appliedFilters.country)?.name;
+         if (countryName) {
+            params.search = searchQuery ? `${searchQuery} ${countryName}` : countryName;
+         }
       }
       
       // Add available from filter
@@ -292,16 +309,17 @@ export default function Properties() {
         </Select>
       </div>
 
-      {/* City */}
-      <div className="space-y-3">
-        <Label className="text-sm font-semibold text-foreground">City</Label>
-        <Input
-          placeholder="Enter city..."
-          value={draftFilters.city}
-          onChange={(e) => setDraftFilters(prev => ({ ...prev, city: e.target.value }))}
-          className="h-10"
-        />
-      </div>
+      {/* Location Filter */}
+      <LocationSelector
+        country={draftFilters.country}
+        state={draftFilters.state}
+        city={draftFilters.city}
+        onCountryChange={(val) => setDraftFilters(prev => ({ ...prev, country: val, state: '', city: '' }))}
+        onStateChange={(val) => setDraftFilters(prev => ({ ...prev, state: val, city: '' }))}
+        onCityChange={(val) => setDraftFilters(prev => ({ ...prev, city: val }))}
+        columnLayout={true}
+        className="pt-2"
+      />
 
       {/* Price Range */}
       <div className="space-y-3">

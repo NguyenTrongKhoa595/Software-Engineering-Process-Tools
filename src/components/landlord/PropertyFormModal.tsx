@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Upload, Image as ImageIcon, Loader2, Plus } from 'lucide-react';
+import { X, Upload, Image as ImageIcon, Loader2, Plus, Check, ChevronsUpDown, Search } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { LocationSelector } from '@/components/property/LocationSelector';
 import {
   Select,
   SelectContent,
@@ -19,6 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +37,7 @@ import { PROPERTY_TYPES, AMENITIES } from '@/types/property';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { propertyApi, PropertyResponseDTO } from '@/lib/api/propertyApi';
+import { Country, State, City, ICountry, IState, ICity } from 'country-state-city';
 
 interface PropertyFormModalProps {
   open: boolean;
@@ -52,7 +64,50 @@ interface FormData {
   rules: string[];
   availableFrom: string;
   minimumLease: string;
+  country: string;
+  state: string;
+  city: string;
+  street: string;
+  postalCode: string;
 }
+
+const VIETNAM_DATA: Record<string, string[]> = {
+  'SG': [ // Ho Chi Minh City
+    'Quận 1', 'Quận 3', 'Quận 4', 'Quận 5', 'Quận 6', 'Quận 7', 'Quận 8', 'Quận 10', 'Quận 11', 'Quận 12',
+    'Quận Bình Thạnh', 'Quận Tân Bình', 'Quận Tân Phú', 'Quận Phú Nhuận', 'Quận Gò Vấp', 'Quận Bình Tân',
+    'Thành phố Thủ Đức', 'Huyện Hóc Môn', 'Huyện Củ Chi', 'Huyện Nhà Bè', 'Huyện Bình Chánh', 'Huyện Cần Giờ'
+  ],
+  'HN': [ // Hanoi
+    'Quận Ba Đình', 'Quận Hoàn Kiếm', 'Quận Tây Hồ', 'Quận Long Biên', 'Quận Cầu Giấy', 'Quận Đống Đa',
+    'Quận Hai Bà Trưng', 'Quận Hoàng Mai', 'Quận Thanh Xuân', 'Quận Nam Từ Liêm', 'Quận Bắc Từ Liêm',
+    'Quận Hà Đông', 'Thị xã Sơn Tây', 'Huyện Ba Vì', 'Huyện Chương Mỹ', 'Huyện Đan Phượng', 'Huyện Đông Anh',
+    'Huyện Gia Lâm', 'Huyện Hoài Đức', 'Huyện Mê Linh', 'Huyện Mỹ Đức', 'Huyện Phú Xuyên', 'Huyện Phúc Thọ',
+    'Huyện Quốc Oai', 'Huyện Sóc Sơn', 'Huyện Thạch Thất', 'Huyện Thanh Oai', 'Huyện Thanh Trì', 'Huyện Thường Tín', 'Huyện Ứng Hòa'
+  ],
+  'DN': [ // Da Nang
+    'Quận Hải Châu', 'Quận Thanh Khê', 'Quận Sơn Trà', 'Quận Ngũ Hành Sơn', 'Quận Liên Chiểu', 'Quận Cẩm Lệ',
+    'Huyện Hòa Vang', 'Huyện Hoàng Sa'
+  ],
+  'HP': [ // Hai Phong
+    'Quận Hồng Bàng', 'Quận Lê Chân', 'Quận Ngô Quyền', 'Quận Kiến An', 'Quận Hải An', 'Quận Dương Kinh', 'Quận Đồ Sơn',
+    'Huyện An Dương', 'Huyện An Lão', 'Huyện Bạch Long Vĩ', 'Huyện Cát Hải', 'Huyện Kiến Thụy', 'Huyện Thủy Nguyên', 'Huyện Tiên Lãng', 'Huyện Vĩnh Bảo'
+  ],
+  'CT': [ // Can Tho
+    'Quận Ninh Kiều', 'Quận Bình Thủy', 'Quận Cái Răng', 'Quận Ô Môn', 'Quận Thốt Nốt',
+    'Huyện Phong Điền', 'Huyện Cờ Đỏ', 'Huyện Vĩnh Thạnh', 'Huyện Thới Lai'
+  ],
+  '57': [ // Binh Duong
+    'Thành phố Thủ Dầu Một', 'Thành phố Thuận An', 'Thành phố Dĩ An', 'Thành phố Tân Uyên', 'Thị xã Bến Cát',
+    'Huyện Bàu Bàng', 'Huyện Dầu Tiếng', 'Huyện Phú Giáo', 'Huyện Bắc Tân Uyên'
+  ],
+  '39': [ // Dong Nai
+    'Thành phố Biên Hòa', 'Thành phố Long Khánh', 'Huyện Long Thành', 'Huyện Nhơn Trạch', 'Huyện Trảng Bom',
+    'Huyện Thống Nhất', 'Huyện Cẩm Mỹ', 'Huyện Vĩnh Cửu', 'Huyện Xuân Lộc', 'Huyện Định Quán', 'Huyện Tân Phú'
+  ],
+  '43': [ // Ba Ria - Vung Tau
+    'Thành phố Vũng Tàu', 'Thành phố Bà Rịa', 'Thị xã Phú Mỹ', 'Huyện Châu Đức', 'Huyện Côn Đảo', 'Huyện Đất Đỏ', 'Huyện Long Điền', 'Huyện Xuyên Mộc'
+  ]
+};
 
 const initialFormData: FormData = {
   title: '',
@@ -72,6 +127,11 @@ const initialFormData: FormData = {
   rules: [],
   availableFrom: '',
   minimumLease: '12',
+  country: 'VN',
+  state: '',
+  city: '',
+  street: '',
+  postalCode: '',
 };
 
 export function PropertyFormModal({ open, onClose, propertyId, onSave }: PropertyFormModalProps) {
@@ -115,11 +175,66 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
           petFriendly: data.petFriendly || false,
           parkingSpaces: String(data.parkingSpaces || 0),
           amenities: data.amenities || [],
-          rules: data.rules || [],
-          availableFrom: data.availableFrom || '',
-          minimumLease: String(data.minimumLease || 12),
-        });
-        // Set existing images
+            rules: data.rules || [],
+            availableFrom: data.availableFrom || '',
+            minimumLease: String(data.minimumLease || 12),
+            country: 'Vietnam',
+            state: '',
+            city: '',
+            street: '',
+            postalCode: '',
+          });
+
+          // Try to parse existing address
+          if (data.address) {
+            const parts = data.address.split(',').map(p => p.trim());
+            // Format: street, city, state, country
+            if (parts.length >= 4) {
+              const countryName = parts[parts.length - 1];
+              const stateName = parts[parts.length - 2];
+              const cityName = parts[parts.length - 3];
+              const streetParts = parts.slice(0, parts.length - 3);
+
+              const country = Country.getAllCountries().find(c => c.name === countryName);
+              if (country) {
+                const state = State.getStatesOfCountry(country.isoCode).find(s => s.name === stateName);
+                
+                // Check if last part is postal code or if we have 5 parts
+                let pCode = '';
+                let finalStreet = streetParts.join(', ');
+                
+                if (parts.length >= 5) {
+                   pCode = parts[parts.length - 1]; // Assume last is postal if 5+
+                }
+
+                setFormData(prev => ({
+                  ...prev,
+                  country: country.isoCode,
+                  state: state?.isoCode || '',
+                  city: cityName,
+                  street: finalStreet,
+                  postalCode: pCode,
+                }));
+              }
+            } else if (parts.length === 3) {
+              // Fallback for street, city, country
+              const countryName = parts[parts.length - 1];
+              const cityName = parts[parts.length - 2];
+              const streetParts = parts.slice(0, parts.length - 2);
+
+              const country = Country.getAllCountries().find(c => c.name === countryName);
+              setFormData(prev => ({
+                ...prev,
+                country: country?.isoCode || '',
+                city: cityName,
+                street: streetParts.join(', '),
+              }));
+            } else {
+              setFormData(prev => ({ ...prev, street: data.address }));
+            }
+          }
+
+          // Set existing images
         if (data.photos) {
           setExistingPhotos(data.photos.map(p => ({ id: p.id, url: p.url })));
           setPreviewUrls(data.photos.map(p => p.url));
@@ -217,19 +332,31 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
   const handleSubmit = async () => {
     if (!user) return;
 
-    if (!formData.title || !formData.rentAmount || !formData.address) {
+    if (!formData.title || !formData.rentAmount || !formData.street || !formData.city) {
       toast.error('Please fill in all required fields.');
       return;
     }
 
     setIsSaving(true);
+    
+    // Get full names for the address string
+    const country = Country.getCountryByCode(formData.country);
+    const state = State.getStateByCodeAndCountry(formData.state, formData.country);
+    const fullAddress = [
+      formData.street,
+      formData.city,
+      state?.name || formData.state,
+      country?.name || formData.country,
+      formData.postalCode
+    ].filter(Boolean).join(', ');
+    
     try {
       if (propertyId) {
         // Update existing property
         await propertyApi.updateProperty(propertyId, {
           title: formData.title,
           description: formData.description,
-          address: formData.address,
+          address: fullAddress,
           rentAmount: parseFloat(formData.rentAmount),
           securityDeposit: formData.securityDeposit ? parseFloat(formData.securityDeposit) : undefined,
           type: formData.type as 'APARTMENT' | 'HOUSE' | 'STUDIO' | 'ROOM' | 'CONDO' | 'TOWNHOUSE',
@@ -253,7 +380,7 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
         await propertyApi.createProperty({
           title: formData.title,
           description: formData.description,
-          address: formData.address,
+          address: fullAddress,
           rentAmount: parseFloat(formData.rentAmount),
           securityDeposit: formData.securityDeposit ? parseFloat(formData.securityDeposit) : undefined,
           type: formData.type as 'APARTMENT' | 'HOUSE' | 'STUDIO' | 'ROOM' | 'CONDO' | 'TOWNHOUSE',
@@ -323,14 +450,37 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
                     rows={3}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address *</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    placeholder="123 Main St, San Francisco, CA 94102"
-                  />
+                <LocationSelector
+                  country={formData.country}
+                  state={formData.state}
+                  city={formData.city}
+                  onCountryChange={(val) => setFormData(prev => ({ ...prev, country: val, state: '', city: '' }))}
+                  onStateChange={(val) => setFormData(prev => ({ ...prev, state: val, city: '' }))}
+                  onCityChange={(val) => setFormData(prev => ({ ...prev, city: val }))}
+                  columnLayout={false}
+                  className="md:col-span-2"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:col-span-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode">Postal Code</Label>
+                    <Input
+                      id="postalCode"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData(prev => ({ ...prev, postalCode: e.target.value }))}
+                      placeholder="e.g. 700000"
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="street">Street Address *</Label>
+                    <Input
+                      id="street"
+                      value={formData.street}
+                      onChange={(e) => setFormData(prev => ({ ...prev, street: e.target.value }))}
+                      placeholder="123 Main St"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

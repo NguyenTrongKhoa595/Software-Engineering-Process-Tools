@@ -45,6 +45,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { managerApi } from '@/lib/api/managerApi';
 import {
   getMaintenanceForLandlord,
   getMaintenanceRequestDetail,
@@ -597,11 +598,8 @@ export default function PropertyManagerMaintenance() {
   const [priorityFilter, setPriorityFilter] = useState<MaintenancePriority | 'ALL'>('ALL');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['manager-maintenance', statusFilter, priorityFilter],
-    queryFn: () => getMaintenanceForLandlord({
-      status: statusFilter,
-      priority: priorityFilter,
-    }),
+    queryKey: ['manager-maintenance'],
+    queryFn: () => managerApi.getManagedMaintenance(),
   });
 
   const { data: summary } = useQuery({
@@ -609,7 +607,12 @@ export default function PropertyManagerMaintenance() {
     queryFn: getMaintenanceSummary,
   });
 
-  const requests = data?.content ?? [];
+  const allRequests = data ?? [];
+  const requests = allRequests.filter(item => {
+    const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
+    const matchesPriority = priorityFilter === 'ALL' || item.priority === priorityFilter;
+    return matchesStatus && matchesPriority;
+  });
 
   if (isLoading) {
     return (

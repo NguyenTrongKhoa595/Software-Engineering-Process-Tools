@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   USER_ME: "/api/users/me",
   USER_UNLINK_ID_DOCUMENT: "/api/users/me/identity-document",
   USERS_SEARCH: "/api/users/search",
+  USERS_MY_PROPERTIES: "/api/users/my-properties", // New endpoint for managed properties
 
   // Files
   FILES_UPLOAD: "/api/files/upload",
@@ -31,6 +32,8 @@ export const API_ENDPOINTS = {
   PROPERTY_DETAIL: (propertyId: number) => `/api/properties/${propertyId}`,
   PROPERTIES_FEATURED: "/api/properties/featured",
   PROPERTIES_BY_LANDLORD: (landlordId: number) => `/api/properties/landlord/${landlordId}`,
+  // PROPERTIES_MY was moved/aliased to USERS_MY_PROPERTIES but we can keep a reference if needed, 
+  // or just use USERS_MY_PROPERTIES. User specified /api/users/my-properties.
   PROPERTY_MANAGER: (propertyId: number) => `/api/properties/${propertyId}/manager`,
 
   // Saved Properties
@@ -41,6 +44,7 @@ export const API_ENDPOINTS = {
   // Lease Applications
   LEASE_APPLICATIONS: "/api/lease-applications",
   LEASE_APPLICATIONS_MY: "/api/lease-applications/my",
+  LEASE_APPLICATIONS_FOR_MANAGER: "/api/lease-applications/for-manager",
   LEASE_APPLICATIONS_FOR_PROPERTY: (propertyId: number) => `/api/lease-applications/for-property/${propertyId}`,
   LEASE_APPLICATION_APPROVE: (applicationId: number) => `/api/lease-applications/${applicationId}/approve`,
   LEASE_APPLICATION_REJECT: (applicationId: number) => `/api/lease-applications/${applicationId}/reject`,
@@ -112,6 +116,9 @@ export const API_ENDPOINTS = {
   REPORTS_LANDLORD_FINANCIAL_TRENDS: "/api/reports/landlord/financial-trends",
   REPORTS_LANDLORD_OVERDUE_PAYMENTS: "/api/reports/landlord/overdue-payments",
   REPORTS_LANDLORD_EXPIRING_LEASES: "/api/reports/landlord/expiring-leases",
+
+  // Manager
+  MANAGER_STATS: "/api/manager/dashboard-stats",
 } as const;
 
 // Token storage keys

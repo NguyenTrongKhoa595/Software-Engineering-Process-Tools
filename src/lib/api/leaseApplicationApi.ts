@@ -81,6 +81,16 @@ export const leaseApplicationApi = {
   },
 
   /**
+   * Get all applications for managed properties (Manager)
+   * GET /api/lease-applications/for-manager
+   */
+  async getApplicationsForManager(): Promise<LeaseApplicationResponseDTO[]> {
+    return api.get<LeaseApplicationResponseDTO[]>(
+      API_ENDPOINTS.LEASE_APPLICATIONS_FOR_MANAGER
+    );
+  },
+
+  /**
    * Get all applications for a specific property (Landlord/Manager)
    * GET /api/lease-applications/for-property/{propertyId}
    */

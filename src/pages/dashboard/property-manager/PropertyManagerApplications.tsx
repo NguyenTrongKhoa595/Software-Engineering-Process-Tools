@@ -12,6 +12,7 @@ import {
   LeaseApplicationStatus 
 } from '@/lib/api/leaseApplicationApi';
 import { propertyApi } from '@/lib/api/propertyApi';
+import { managerApi } from '@/lib/api/managerApi';
 import { ApiError } from '@/lib/api/client';
 import { 
   Dialog, 
@@ -42,14 +43,8 @@ export default function PropertyManagerApplications() {
 
     try {
       setIsLoading(true);
-      // Property managers need to get their managed properties first
-      // For now, we'll fetch applications using a different approach
-      // This would typically be a dedicated endpoint like /api/manager/applications
-      
-      // Since we don't have that endpoint yet, we'll show a placeholder
-      // In a real implementation, you'd call something like:
-      // const apps = await leaseApplicationApi.getManagerApplications();
-      setApplications([]);
+      const data = await managerApi.getManagedApplications();
+      setApplications(data);
     } catch (error) {
       if (error instanceof ApiError) {
         toast({

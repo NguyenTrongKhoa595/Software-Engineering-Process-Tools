@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import { Building2, FileText, ScrollText, MessageSquare, Wrench } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  getPropertiesForManager, 
-  getApplicationsForManager, 
-  getLeasesForManager, 
-  getMaintenanceForManager
-} from '@/lib/mockDatabase';
+import { managerApi } from '@/lib/api/managerApi';
+import { PropertySummaryDTO } from '@/lib/api/propertyApi';
+import { LeaseApplicationResponseDTO } from '@/lib/api/leaseApplicationApi';
+import { LeaseResponseDTO } from '@/lib/api/leaseApi';
 import { conversationsApi } from '@/lib/api/conversationsApi';
-import { Property } from '@/types/property';
-import { Application } from '@/types/tenant';
-import { LeaseAgreement } from '@/types/landlord';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -41,29 +36,66 @@ function StatsCard({ title, value, description, icon: Icon }: StatsCardProps) {
 export default function PropertyManagerDashboardHome() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [leases, setLeases] = useState<LeaseAgreement[]>([]);
+  const [properties, setProperties] = useState<PropertySummaryDTO[]>([]);
+  const [applications, setApplications] = useState<LeaseApplicationResponseDTO[]>([]);
+  const [leases, setLeases] = useState<LeaseResponseDTO[]>([]);
   const [maintenanceCount, setMaintenanceCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
+  const loadDashboardData = async () => {
+    // 1. Properties
+    try {
+      const props = await managerApi.getManagedProperties();
+      console.log('PM Properties:', props);
+      setProperties(props);
+    } catch (error) {
+      console.error('Failed to load PM Properties:', error);
+    }
+
+    // 2. Applications
+    try {
+      const apps = await managerApi.getManagedApplications();
+      console.log('PM Applications:', apps);
+      setApplications(apps);
+    } catch (error) {
+      console.error('Failed to load PM Applications:', error);
+    }
+
+    // 3. Leases
+    try {
+      const leaseList = await managerApi.getManagedLeases();
+      console.log('PM Leases:', leaseList);
+      setLeases(leaseList);
+    } catch (error) {
+      console.error('Failed to load PM Leases:', error);
+    }
+
+    // 4. Maintenance
+    try {
+      const maint = await managerApi.getManagedMaintenance();
+      console.log('PM Maintenance:', maint);
+      setMaintenanceCount(maint.filter(m => m.status === 'OPEN').length);
+    } catch (error) {
+      console.error('Failed to load PM Maintenance:', error);
+    }
+      
+    // 5. Unread Messages
+    try {
+      const msgs = await conversationsApi.getUnreadCount();
+      setUnreadMessages(msgs.unreadCount);
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
-      setProperties(getPropertiesForManager(user.id));
-      setApplications(getApplicationsForManager(user.id));
-      setLeases(getLeasesForManager(user.id));
-      const maintenance = getMaintenanceForManager(user.id);
-      setMaintenanceCount(maintenance.filter(m => m.status === 'open').length);
-      
-      // Fetch unread count from API
-      conversationsApi.getUnreadCount()
-        .then(response => setUnreadMessages(response.unreadCount))
-        .catch(err => console.error('Failed to fetch unread count:', err));
+      loadDashboardData();
     }
   }, [user]);
 
-  const pendingApplications = applications.filter(app => app.status === 'pending' || app.status === 'under_review');
-  const activeLeases = leases.filter(lease => lease.status === 'active');
+  const pendingApplications = applications.filter(app => app.status === 'PENDING');
+  const activeLeases = leases.filter(lease => lease.status === 'ACTIVE');
 
   return (
     <div className="space-y-6">
@@ -129,10 +161,10 @@ export default function PropertyManagerDashboardHome() {
                     <div>
                       <p className="font-medium text-sm">{app.property.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        Applied {new Date(app.appliedAt).toLocaleDateString()}
+                        Applied {new Date(app.applicationDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <Badge variant={app.status === 'pending' ? 'secondary' : 'outline'}>
+                    <Badge variant={app.status === 'PENDING' ? 'secondary' : 'outline'}>
                       {app.status.replace('_', ' ')}
                     </Badge>
                   </div>
@@ -173,20 +205,20 @@ export default function PropertyManagerDashboardHome() {
                   <div key={property.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <img 
-                        src={property.thumbnail} 
+                        src={property.coverImageUrl || '/placeholder.svg'} 
                         alt={property.title}
                         className="h-10 w-10 rounded object-cover"
                       />
                       <div>
                         <p className="font-medium text-sm truncate max-w-[180px]">{property.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          ${property.price}/mo
+                          ${property.rentAmount}/mo
                         </p>
                       </div>
                     </div>
                     <Badge variant={
-                      property.status === 'available' ? 'default' : 
-                      property.status === 'rented' ? 'secondary' : 'outline'
+                      property.status === 'AVAILABLE' ? 'default' : 
+                      property.status === 'RENTED' ? 'secondary' : 'outline'
                     }>
                       {property.status}
                     </Badge>

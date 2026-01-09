@@ -4,18 +4,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { getPropertiesForManager } from '@/lib/mockDatabase';
-import { Property } from '@/types/property';
+import { managerApi } from '@/lib/api/managerApi';
+import { PropertySummaryDTO } from '@/lib/api/propertyApi';
 import { useNavigate } from 'react-router-dom';
 
 export default function PropertyManagerProperties() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<PropertySummaryDTO[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setIsLoading(true);
+        const data = await managerApi.getManagedProperties();
+        setProperties(data);
+      } catch (error) {
+        console.error('Failed to fetch managed properties:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (user) {
-      setProperties(getPropertiesForManager(user.id));
+      fetchProperties();
     }
   }, [user]);
 
@@ -61,22 +74,22 @@ export default function PropertyManagerProperties() {
             <Card key={property.id} className="overflow-hidden">
               <div className="relative">
                 <img
-                  src={property.thumbnail}
+                  src={property.coverImageUrl || '/placeholder.svg'}
                   alt={property.title}
                   className="h-48 w-full object-cover"
                 />
                 <Badge 
                   className="absolute top-3 right-3"
-                  variant={getStatusColor(property.status)}
+                  variant={getStatusColor(property.status.toLowerCase())}
                 >
                   {property.status}
                 </Badge>
               </div>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg truncate">{property.title}</CardTitle>
-                <CardDescription className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {property.address.city}, {property.address.state}
+                <CardDescription className="flex items-center gap-1 truncate">
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{property.address}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -86,12 +99,12 @@ export default function PropertyManagerProperties() {
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className="text-xl font-bold">${property.price}</span>
+                  <span className="text-xl font-bold">${property.rentAmount}</span>
                   <span className="text-muted-foreground text-sm">/month</span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                   <Users className="h-3 w-3" />
-                  Owner: {property.landlord.name}
+                  Owner: {property.landlordName}
                 </div>
                 <Button 
                   className="w-full mt-4" 

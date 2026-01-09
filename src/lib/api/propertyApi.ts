@@ -217,6 +217,11 @@ export const propertyApi = {
     return api.get<PropertySummaryDTO[]>(API_ENDPOINTS.PROPERTIES_BY_LANDLORD(landlordId));
   },
 
+  // Get my properties (Landlord/Manager)
+  getMyProperties: async (): Promise<PropertySummaryDTO[]> => {
+    return api.get<PropertySummaryDTO[]>(API_ENDPOINTS.USERS_MY_PROPERTIES);
+  },
+
   // Create property (landlord only)
   createProperty: async (data: CreatePropertyData): Promise<PropertyResponseDTO> => {
     const token = getAuthToken();

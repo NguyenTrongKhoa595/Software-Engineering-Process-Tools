@@ -1,28 +1,42 @@
 import { api } from "./client";
-import { API_BASE_URL } from "./config";
-import { PropertySummaryDTO, PropertyResponseDTO } from "./propertyApi";
-import { LeaseApplicationResponseDTO } from "./leaseApplicationApi";
-import { LeaseResponseDTO } from "./leaseApi";
-import { MaintenanceListItem } from "./maintenanceApi";
+import { API_BASE_URL, API_ENDPOINTS } from "./config";
+import propertyApi, { PropertySummaryDTO, PropertyResponseDTO } from "./propertyApi";
+import { leaseApplicationApi, LeaseApplicationResponseDTO } from "./leaseApplicationApi";
+import { LeaseResponseDTO, leaseApi } from "./leaseApi";
+import { MaintenanceListItem, getMaintenanceForLandlord } from "./maintenanceApi";
+
+export interface ManagerDashboardStats {
+  managedPropertiesCount: number;
+  pendingApplicationsCount: number;
+  activeLeasesCount: number;
+  openMaintenanceCount: number;
+}
 
 export const managerApi = {
+  // Get dashboard statistics
+  getDashboardStats: async (): Promise<ManagerDashboardStats> => {
+    return api.get<ManagerDashboardStats>(API_ENDPOINTS.MANAGER_STATS);
+  },
+
   // Get properties managed by the current user
   getManagedProperties: async (): Promise<PropertySummaryDTO[]> => {
-    return api.get<PropertySummaryDTO[]>("/api/manager/properties");
+    return propertyApi.getMyProperties();
   },
 
   // Get applications for managed properties
   getManagedApplications: async (): Promise<LeaseApplicationResponseDTO[]> => {
-    return api.get<LeaseApplicationResponseDTO[]>("/api/manager/applications");
+    return leaseApplicationApi.getApplicationsForManager();
   },
 
   // Get leases for managed properties
   getManagedLeases: async (): Promise<LeaseResponseDTO[]> => {
-    return api.get<LeaseResponseDTO[]>("/api/manager/leases");
+    // Using existing landlord endpoint which supports managers
+    return leaseApi.getLeasesForLandlord();
   },
 
   // Get maintenance requests for managed properties
   getManagedMaintenance: async (): Promise<MaintenanceListItem[]> => {
-    return api.get<MaintenanceListItem[]>("/api/manager/maintenance");
+    const response = await getMaintenanceForLandlord();
+    return response.content;
   },
 };

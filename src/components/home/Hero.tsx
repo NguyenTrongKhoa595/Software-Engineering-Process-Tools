@@ -23,7 +23,7 @@ export function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 -z-20">
         <img 
-          src="public\home_page_cover.jpg" 
+          src="/home_page_cover.jpg" 
           alt="Modern Home" 
           className="w-full h-full object-cover"
         />

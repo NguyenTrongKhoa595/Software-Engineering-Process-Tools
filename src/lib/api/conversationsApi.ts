@@ -99,7 +99,6 @@ export interface PaginatedConversations {
 
 // ============= API Functions =============
 
-const CONVERSATIONS_BASE = `${API_BASE_URL}/api/conversations`;
 
 /**
  * Get all conversations for the current user

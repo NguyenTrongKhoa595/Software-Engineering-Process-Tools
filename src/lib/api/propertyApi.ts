@@ -194,26 +194,12 @@ function buildQueryString(params: PropertySearchParams): string {
   const queryString = searchParams.toString();
   return queryString ? `?${queryString}` : '';
 }
-
 // API Functions
 export const propertyApi = {
   // Search properties (public)
   searchProperties: async (params: PropertySearchParams = {}): Promise<PaginatedResponse<PropertySummaryDTO>> => {
     const queryString = buildQueryString(params);
-    const response = await fetch(`${API_BASE_URL}/api/properties${queryString}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Failed to fetch properties');
-    }
-    
-    return response.json();
+    return api.get<PaginatedResponse<PropertySummaryDTO>>(`${API_ENDPOINTS.PROPERTIES}${queryString}`);
   },
 
   // Get single property (public/authenticated)
@@ -223,38 +209,12 @@ export const propertyApi = {
 
   // Get featured properties (public)
   getFeaturedProperties: async (): Promise<PropertySummaryDTO[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/properties/featured`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Failed to fetch featured properties');
-    }
-    
-    return response.json();
+    return api.get<PropertySummaryDTO[]>(API_ENDPOINTS.PROPERTIES_FEATURED);
   },
 
   // Get properties by landlord (public)
   getPropertiesByLandlord: async (landlordId: number): Promise<PropertySummaryDTO[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/properties/landlord/${landlordId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-    });
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Failed to fetch landlord properties');
-    }
-    
-    return response.json();
+    return api.get<PropertySummaryDTO[]>(API_ENDPOINTS.PROPERTIES_BY_LANDLORD(landlordId));
   },
 
   // Create property (landlord only)

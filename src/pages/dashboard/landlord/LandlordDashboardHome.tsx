@@ -167,7 +167,7 @@ export default function LandlordDashboardHome() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate('/dashboard/applications')} // Note: This route might list apps by property or generic list
+                    onClick={() => navigate('/dashboard/landlord-applications')} // Note: This route might list apps by property or generic list
                   >
                     View All Applications
                   </Button>
@@ -192,7 +192,7 @@ export default function LandlordDashboardHome() {
             ) : !properties || properties.length === 0 ? (
               <div className="text-center py-4">
                 <p className="text-sm text-muted-foreground mb-3">No properties listed yet</p>
-                <Button onClick={() => navigate('/dashboard/properties')}>
+                <Button onClick={() => navigate('/dashboard/landlord-properties')}>
                   Add Your First Property
                 </Button>
               </div>
@@ -202,7 +202,7 @@ export default function LandlordDashboardHome() {
                   <div key={property.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <img 
-                        src={property.coverImageUrl || property.thumbnail || '/placeholder.svg'} 
+                        src={property.coverImageUrl || '/placeholder.svg'} 
                         alt={property.title}
                         className="h-10 w-10 rounded object-cover"
                       />
@@ -225,7 +225,7 @@ export default function LandlordDashboardHome() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate('/dashboard/landlord/properties')}
+                    onClick={() => navigate('/dashboard/landlord-properties')}
                   >
                     View All Properties
                   </Button>

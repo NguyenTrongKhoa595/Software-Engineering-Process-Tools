@@ -81,9 +81,14 @@ const App = () => (
                 <Route path="leases" element={<TenantLeases />} />
                 
                 {/* Landlord-specific routes */}
-                <Route path="properties" element={<LandlordProperties />} />
+                <Route path="landlord-properties" element={<LandlordProperties />} />
+                <Route path="landlord-applications" element={<Applications />} />
                 <Route path="landlord-leases" element={<LeaseAgreements />} />
                 <Route path="landlord-maintenance" element={<LandlordMaintenance />} />
+                <Route path="landlord-messages" element={<Messages />} />
+                <Route path="landlord-messages/:id" element={<Messages />} />
+                <Route path="landlord-profile" element={<Profile />} />
+                <Route path="landlord-notifications" element={<Notifications />} />
                 
                 {/* Property Manager routes */}
                 <Route path="pm-properties" element={<PropertyManagerProperties />} />

@@ -35,16 +35,16 @@ import { Badge } from '@/components/ui/badge';
 
 const mainNavItems = [
   { title: 'Dashboard', url: '/dashboard', icon: Home },
-  { title: 'My Properties', url: '/dashboard/properties', icon: Building2 },
-  { title: 'Applications', url: '/dashboard/applications', icon: FileText },
+  { title: 'My Properties', url: '/dashboard/landlord-properties', icon: Building2 },
+  { title: 'Applications', url: '/dashboard/landlord-applications', icon: FileText },
   { title: 'Lease Agreements', url: '/dashboard/landlord-leases', icon: ScrollText },
   { title: 'Maintenance', url: '/dashboard/landlord-maintenance', icon: Wrench },
-  { title: 'Messages', url: '/dashboard/messages', icon: MessageSquare, badgeType: 'messages' },
-  { title: 'Notifications', url: '/dashboard/notifications', icon: Bell, badgeType: 'notifications' },
+  { title: 'Messages', url: '/dashboard/landlord-messages', icon: MessageSquare, badgeType: 'messages' },
+  { title: 'Notifications', url: '/dashboard/landlord-notifications', icon: Bell, badgeType: 'notifications' },
 ];
 
 const accountNavItems = [
-  { title: 'Profile & Settings', url: '/dashboard/profile', icon: User },
+  { title: 'Profile & Settings', url: '/dashboard/landlord-profile', icon: User },
 ];
 
 export function LandlordSidebar() {

@@ -56,9 +56,9 @@ function normalizeUser(apiUser: ApiUser): NormalizedUser {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
-  confirmNewPassword: string;
+  confirmPassword: string;
 }
 
 export interface ForgotPasswordRequest {

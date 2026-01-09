@@ -60,17 +60,18 @@ export function ChangePasswordModal({ open, onClose }: ChangePasswordModalProps)
 
     setIsSubmitting(true);
 
-    try {
-      await changePassword(formData.currentPassword, formData.newPassword, formData.confirmPassword);
+    const result = await changePassword(formData.currentPassword, formData.newPassword, formData.confirmPassword);
+    
+    if (result.success) {
       toast.success('Password changed successfully');
       handleClose();
-    } catch (err: any) {
-      const message = err?.message || 'Failed to change password';
+    } else {
+      const message = result.error || 'Failed to change password';
       setError(message);
       toast.error(message);
-    } finally {
-      setIsSubmitting(false);
     }
+    
+    setIsSubmitting(false);
   };
 
   const handleClose = () => {

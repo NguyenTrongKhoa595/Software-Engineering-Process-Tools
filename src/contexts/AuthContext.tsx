@@ -87,7 +87,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     confirmNewPassword: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await authApi.changePassword({ currentPassword, newPassword, confirmNewPassword });
+      await authApi.changePassword({ 
+        oldPassword: currentPassword, 
+        newPassword, 
+        confirmPassword: confirmNewPassword 
+      });
       return { success: true };
     } catch (error) {
       if (error instanceof ApiError) {

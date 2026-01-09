@@ -41,8 +41,18 @@ export default function Contact() {
       
       <main className="flex-1">
         {/* Hero */}
-        <section className="section-padding bg-muted/30">
-          <div className="container-custom text-center">
+        <section className="relative section-padding overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 -z-10">
+            <img 
+              src="/home_page_cover.jpg" 
+              alt="Background" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
+          </div>
+
+          <div className="container-custom text-center relative z-10">
             <h1 className="text-display-md font-bold text-foreground mb-6">Contact Us</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Have a question or need help? We're here for you. Reach out and we'll respond as soon as possible.

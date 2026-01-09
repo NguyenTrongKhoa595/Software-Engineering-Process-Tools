@@ -34,8 +34,18 @@ export default function About() {
       
       <main className="flex-1">
         {/* Hero */}
-        <section className="section-padding bg-muted/30">
-          <div className="container-custom text-center">
+        <section className="relative section-padding overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 -z-10">
+            <img 
+              src="/home_page_cover.jpg" 
+              alt="Background" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
+          </div>
+
+          <div className="container-custom text-center relative z-10">
             <h1 className="text-display-md font-bold text-foreground mb-6">About RentMate</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               A student-led initiative from RMIT University to revolutionize the rental experience in Vietnam.

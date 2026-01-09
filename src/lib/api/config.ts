@@ -1,6 +1,5 @@
 // API Configuration
-// Change this URL when your ngrok link changes
-export const API_BASE_URL = "http://localhost:8081";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
 
 // WebSocket URL (same base, /ws endpoint)
 export const WS_URL = `${API_BASE_URL}/ws`;

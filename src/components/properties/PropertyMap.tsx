@@ -14,15 +14,15 @@ const createPriceIcon = (price: number) => {
     return L.divIcon({
         className: 'custom-marker-container',
         html: `
-            <div class="relative group cursor-pointer">
-                <div class="bg-background text-foreground font-bold px-3 py-1.5 rounded-full shadow-lg border border-border text-sm hover:scale-110 transition-transform duration-200 whitespace-nowrap">
+            <div class="relative group cursor-pointer -translate-x-1/2 -translate-y-full hover:z-50 pb-2">
+                <div class="bg-white text-slate-900 font-extrabold px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.3)] border border-slate-200 text-sm w-max hover:scale-110 hover:bg-slate-900 hover:text-white transition-all duration-200 whitespace-nowrap">
                     $${price.toLocaleString()}
                 </div>
-                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-background border-r border-b border-border rotate-45"></div>
+                <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-slate-200 rotate-45 group-hover:bg-slate-900 group-hover:border-slate-900 transition-colors"></div>
             </div>
         `,
-        iconSize: [60, 40], // Approximate size
-        iconAnchor: [30, 40],
+        iconSize: [0, 0], 
+        iconAnchor: [0, 0],
     });
 };
 
@@ -132,8 +132,8 @@ export function PropertyMap({ properties, center = DEFAULT_CENTER, zoom = 13 }: 
                                     </div>
 
                                     <div className="flex gap-2 mt-3">
-                                        <Button size="sm" className="w-full font-semibold shadow-sm" asChild>
-                                            <Link to={`/properties/${property.id}`}>View Details</Link>
+                                        <Button size="sm" className="w-full font-semibold shadow-sm !text-white" asChild>
+                                            <Link to={`/properties/${property.id}`} className="!text-white hover:!text-white">View Details</Link>
                                         </Button>
                                     </div>
                                 </div>

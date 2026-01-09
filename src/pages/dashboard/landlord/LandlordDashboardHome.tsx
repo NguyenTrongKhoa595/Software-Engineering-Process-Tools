@@ -208,7 +208,11 @@ export default function LandlordDashboardHome() {
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-4">
         <FinancialOverview 
             data={financialData?.summary || { totalRevenue: 0, pendingRevenue: 0, expenses: 0, netIncome: 0 }} 
-            trendData={trendData || []}
+            trendData={trendData?.map(item => ({
+              month: item.label,
+              revenue: item.revenue,
+              expenses: item.expenses
+            })) || []}
             isLoading={isLoadingFinancial || isLoadingTrends} 
         />
         <ActionItems 
@@ -221,7 +225,13 @@ export default function LandlordDashboardHome() {
       {/* Rent Roll Section - NEW */}
       <div className="grid gap-4">
         <RentRoll 
-            data={rentRollData || []} 
+            data={rentRollData?.map(item => ({
+              ...item,
+              totalPaid: item.financials.totalPaidYTD,
+              totalDue: item.financials.totalDueYTD,
+              lastPaymentDate: item.financials.lastPaymentDate,
+              nextDueDate: item.financials.nextDueDate
+            })) || []} 
             isLoading={isLoadingRentRoll} 
         />
       </div>

@@ -106,6 +106,13 @@ export const API_ENDPOINTS = {
   NOTIFICATIONS_READ_ALL: "/api/notifications/read-all",
   NOTIFICATION_DELETE: (id: number) => `/api/notifications/${id}`,
   NOTIFICATIONS_DELETE_READ: "/api/notifications/read",
+
+  // Reports
+  REPORTS_LANDLORD_RENT_ROLL: "/api/reports/landlord/rent-roll",
+  REPORTS_LANDLORD_FINANCIAL_SUMMARY: "/api/reports/landlord/financial-summary",
+  REPORTS_LANDLORD_FINANCIAL_TRENDS: "/api/reports/landlord/financial-trends",
+  REPORTS_LANDLORD_OVERDUE_PAYMENTS: "/api/reports/landlord/overdue-payments",
+  REPORTS_LANDLORD_EXPIRING_LEASES: "/api/reports/landlord/expiring-leases",
 } as const;
 
 // Token storage keys

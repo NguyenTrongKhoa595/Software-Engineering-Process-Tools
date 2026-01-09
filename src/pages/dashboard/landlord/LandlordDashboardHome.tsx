@@ -6,11 +6,17 @@ import { conversationsApi } from '@/lib/api/conversationsApi';
 import { propertyApi } from '@/lib/api/propertyApi';
 import { leaseApi } from '@/lib/api/leaseApi';
 import { leaseApplicationApi } from '@/lib/api/leaseApplicationApi';
+import { reportApi } from '@/lib/api/reportApi';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, subMonths } from 'date-fns';
+import { FinancialOverview } from '@/components/dashboard/landlord/FinancialOverview';
+import { ActionItems } from '@/components/dashboard/landlord/ActionItems';
+import { RentRoll } from '@/components/dashboard/landlord/RentRoll';
+import { DashboardFilter } from '@/components/dashboard/landlord/DashboardFilter';
+import { DateRange } from 'react-day-picker';
 
 interface StatsCardProps {
   title: string;
@@ -48,28 +54,41 @@ export default function LandlordDashboardHome() {
   const navigate = useNavigate();
   const [unreadMessages, setUnreadMessages] = useState(0);
 
-  // 1. Fetch Properties (needed first to get applications)
+  // Date Filter State (Default: Last 6 Months)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subMonths(new Date(), 6),
+    to: new Date(),
+  });
+
+  // Query Params Helper
+  const fromDateStr = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : '';
+  const toDateStr = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : '';
+
+  // 1. Fetch Properties & Leases (Basic Stats)
   const { data: properties, isLoading: isLoadingProperties } = useQuery({
     queryKey: ['landlord-properties', user?.id],
     queryFn: () => propertyApi.getPropertiesByLandlord(Number(user?.id)),
     enabled: !!user?.id,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 
-  // 2. Fetch Leases
   const { data: leases, isLoading: isLoadingLeases } = useQuery({
     queryKey: ['landlord-leases'],
     queryFn: () => leaseApi.getLeasesForLandlord(),
     enabled: !!user?.id,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 
-  // 3. Fetch Applications (Aggregate from all properties)
+  // 2. Fetch Applications
   const { data: applications, isLoading: isLoadingApplications } = useQuery({
     queryKey: ['landlord-applications-aggregated', properties?.map(p => p.id)],
     queryFn: async () => {
       if (!properties || properties.length === 0) return [];
       const promises = properties.map(p => 
         leaseApplicationApi.getApplicationsForProperty(p.id)
-          .catch(() => []) // Handle error per property gracefully
+          .catch(() => []) 
       );
       const results = await Promise.all(promises);
       return results.flat().sort((a, b) => 
@@ -77,7 +96,59 @@ export default function LandlordDashboardHome() {
       );
     },
     enabled: !!properties && properties.length > 0,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
+
+  // 3. REAL REPORT APIs (Replaces Frontend Calculation)
+  
+  // Financial Summary
+  const { data: financialData, isLoading: isLoadingFinancial } = useQuery({
+    queryKey: ['financial-summary', fromDateStr, toDateStr],
+    queryFn: () => reportApi.getFinancialSummary(fromDateStr, toDateStr),
+    enabled: !!fromDateStr && !!toDateStr,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 1, // Don't loop indefinitely on error
+  });
+
+  // Financial Trends
+  const { data: trendData, isLoading: isLoadingTrends } = useQuery({
+    queryKey: ['financial-trends', fromDateStr, toDateStr],
+    queryFn: () => reportApi.getFinancialTrends(fromDateStr, toDateStr, 'month'), // Default to month for now
+    enabled: !!fromDateStr && !!toDateStr,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  // Rent Roll
+  const { data: rentRollData, isLoading: isLoadingRentRoll } = useQuery({
+    queryKey: ['rent-roll'],
+    queryFn: () => reportApi.getRentRoll(),
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  // Overdue Payments
+  const { data: overduePayments, isLoading: isLoadingOverdue } = useQuery({
+    queryKey: ['overdue-payments'],
+    queryFn: () => reportApi.getOverduePayments(),
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  // Expiring Leases
+  const { data: expiringLeases, isLoading: isLoadingExpiring } = useQuery({
+    queryKey: ['expiring-leases'],
+    queryFn: () => reportApi.getExpiringLeases(),
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
 
   useEffect(() => {
      // Fetch unread count
@@ -90,15 +161,16 @@ export default function LandlordDashboardHome() {
   const activeLeases = leases?.filter(lease => lease.status === 'ACTIVE') || [];
   const availableProperties = properties?.filter(prop => prop.status === 'AVAILABLE') || [];
 
-  const isLoading = isLoadingProperties || isLoadingLeases;
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Landlord Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back, {user?.fullName?.split(' ')[0]}! Here's an overview of your properties.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Landlord Dashboard</h1>
+            <p className="text-muted-foreground">
+            Overview of your properties and financial performance.
+            </p>
+        </div>
+        <DashboardFilter date={dateRange} setDate={setDateRange} />
       </div>
 
       {/* Stats Grid */}
@@ -129,6 +201,28 @@ export default function LandlordDashboardHome() {
           value={unreadMessages}
           description="From tenants"
           icon={MessageSquare}
+        />
+      </div>
+
+      {/* New Financial & Action Items Section */}
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-4">
+        <FinancialOverview 
+            data={financialData?.summary || { totalRevenue: 0, pendingRevenue: 0, expenses: 0, netIncome: 0 }} 
+            trendData={trendData || []}
+            isLoading={isLoadingFinancial || isLoadingTrends} 
+        />
+        <ActionItems 
+            overduePayments={overduePayments || []}
+            expiringLeases={expiringLeases || []}
+            isLoadingExternal={isLoadingOverdue || isLoadingExpiring}
+        />
+      </div>
+
+      {/* Rent Roll Section - NEW */}
+      <div className="grid gap-4">
+        <RentRoll 
+            data={rentRollData || []} 
+            isLoading={isLoadingRentRoll} 
         />
       </div>
 
@@ -167,7 +261,7 @@ export default function LandlordDashboardHome() {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => navigate('/dashboard/landlord-applications')} // Note: This route might list apps by property or generic list
+                    onClick={() => navigate('/dashboard/landlord-applications')}
                   >
                     View All Applications
                   </Button>

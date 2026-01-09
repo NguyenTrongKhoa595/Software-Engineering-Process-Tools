@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { propertyApi, PropertySummaryDTO, PropertySearchParams } from '@/lib/api/propertyApi';
 import { savedPropertiesApi } from '@/lib/api/savedPropertiesApi';
 import { LocationSelector } from '@/components/property/LocationSelector';
+import { PropertyMap } from '@/components/properties/PropertyMap';
 
 const PROPERTY_TYPE_OPTIONS = [
   { value: 'APARTMENT', label: 'Apartment' },
@@ -74,7 +75,7 @@ export default function Properties() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [favorites, setFavorites] = useState<string[]>([]);
   
   // Draft filter state (before applying)
@@ -83,11 +84,14 @@ export default function Properties() {
   // Applied filter state
   const [appliedFilters, setAppliedFilters] = useState<FilterState>({ ...DEFAULT_FILTERS });
 
+  // Near Me Logic
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
   // Fetch properties from API
   const fetchProperties = useCallback(async () => {
     setIsLoading(true);
     try {
-      const params: PropertySearchParams = {
+      const params: PropertySearchParams & { lat?: number; lng?: number; radius?: number } = {
         page: currentPage,
         size: 12,
       };
@@ -95,6 +99,13 @@ export default function Properties() {
       // Add search
       if (searchQuery) {
         params.search = searchQuery;
+      }
+
+      // Geo Search (Near Me)
+      if (userLocation) {
+        params.lat = userLocation.lat;
+        params.lng = userLocation.lng;
+        params.radius = 10; // 10km radius default
       }
       
       // Add price filters
@@ -151,20 +162,21 @@ export default function Properties() {
         params.amenities = appliedFilters.selectedAmenities.join(',');
       }
       
-      // Add location filters
-      if (appliedFilters.city) {
-        params.city = appliedFilters.city;
-      } else if (appliedFilters.state) {
-        const stateName = State.getStateByCodeAndCountry(appliedFilters.state, appliedFilters.country)?.name;
-        if (stateName) {
-           params.search = searchQuery ? `${searchQuery} ${stateName}` : stateName;
+      // Add location filters (Only if not using Near Me)
+      if (!userLocation) {
+        if (appliedFilters.city) {
+          params.city = appliedFilters.city;
+        } else if (appliedFilters.state) {
+          const stateName = State.getStateByCodeAndCountry(appliedFilters.state, appliedFilters.country)?.name;
+          if (stateName) {
+             params.search = searchQuery ? `${searchQuery} ${stateName}` : stateName;
+          }
+        } else if (appliedFilters.country && appliedFilters.country !== 'VN') {
+           const countryName = Country.getCountryByCode(appliedFilters.country)?.name;
+           if (countryName) {
+              params.search = searchQuery ? `${searchQuery} ${countryName}` : countryName;
+           }
         }
-      } else if (appliedFilters.country && appliedFilters.country !== 'VN') {
-         // Only search by country if it's not the default (VN) to avoid noise
-         const countryName = Country.getCountryByCode(appliedFilters.country)?.name;
-         if (countryName) {
-            params.search = searchQuery ? `${searchQuery} ${countryName}` : countryName;
-         }
       }
       
       // Add available from filter
@@ -206,7 +218,7 @@ export default function Properties() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, appliedFilters, sortBy, currentPage]);
+  }, [searchQuery, appliedFilters, sortBy, currentPage, userLocation]);
 
   useEffect(() => {
     fetchProperties();
@@ -230,8 +242,34 @@ export default function Properties() {
   }, [user, isAuthenticated]);
 
   const applyFilters = () => {
+    setUserLocation(null); // Clear Near Me when manual filters apply
     setAppliedFilters({ ...draftFilters });
     setCurrentPage(0);
+  };
+
+  const handleNearMe = () => {
+    if ("geolocation" in navigator) {
+      setIsLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setDraftFilters({ ...DEFAULT_FILTERS }); // Reset other filters visually or keep them? Resetting for "Near Me" is usually cleaner
+          setAppliedFilters({ ...DEFAULT_FILTERS });
+          setViewMode('map'); // Switch to map view
+          toast.success("Found your location!");
+        },
+        (error) => {
+          console.error(error);
+          toast.error("Could not get your location. Please check browser permissions.");
+          setIsLoading(false);
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser");
+    }
   };
 
   const toggleFavorite = async (id: string) => {
@@ -258,12 +296,14 @@ export default function Properties() {
 
   const clearFilters = () => {
     setSearchQuery('');
+    setUserLocation(null);
     setDraftFilters({ ...DEFAULT_FILTERS });
     setAppliedFilters({ ...DEFAULT_FILTERS });
     setCurrentPage(0);
   };
 
   const hasActiveFilters = 
+    userLocation !== null ||
     appliedFilters.priceRange[0] > 0 || 
     appliedFilters.priceRange[1] < 10000 || 
     appliedFilters.selectedBedrooms !== 'any' ||
@@ -564,6 +604,17 @@ export default function Properties() {
                 className="pl-10 h-12" 
               />
             </div>
+            
+            {/* Near Me Button */}
+            <Button 
+              variant={userLocation ? "default" : "outline"} 
+              className={cn("h-12 w-full md:w-auto", userLocation ? "bg-green-600 hover:bg-green-700 text-white" : "")}
+              onClick={handleNearMe}
+            >
+               <MapPin className="mr-2 h-4 w-4" /> 
+               {userLocation ? "Near Me Active" : "Near Me"}
+            </Button>
+
             <div className="flex gap-3">
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-[180px] h-12">
@@ -580,12 +631,15 @@ export default function Properties() {
                 </SelectContent>
               </Select>
               
-              <div className="hidden md:flex border border-border rounded-lg overflow-hidden">
+              <div className="flex border border-border rounded-lg overflow-hidden shrink-0">
                 <button onClick={() => setViewMode('grid')} className={cn('p-3', viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted')}>
                   <Grid3X3 className="h-5 w-5" />
                 </button>
                 <button onClick={() => setViewMode('list')} className={cn('p-3', viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted')}>
                   <List className="h-5 w-5" />
+                </button>
+                <button onClick={() => setViewMode('map')} className={cn('p-3', viewMode === 'map' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted')}>
+                   <MapPin className="h-5 w-5" />
                 </button>
               </div>
 
@@ -616,7 +670,7 @@ export default function Properties() {
               </div>
             </aside>
 
-            {/* Properties Grid */}
+            {/* Properties Grid / MAP */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
                 <p className="text-muted-foreground">
@@ -640,6 +694,8 @@ export default function Properties() {
                   <p className="text-muted-foreground mb-6">Try adjusting your filters or search criteria</p>
                   <Button onClick={clearFilters}>Clear All Filters</Button>
                 </div>
+              ) : viewMode === 'map' ? (
+                <PropertyMap properties={properties} center={userLocation ? [userLocation.lat, userLocation.lng] : undefined} />
               ) : (
                 <div className={cn(viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4')}>
                   {properties.map(property => (

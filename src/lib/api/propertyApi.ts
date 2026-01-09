@@ -58,6 +58,10 @@ export interface PropertyResponseDTO {
   views: number;
   createdAt: string;
   updatedAt: string;
+
+  // Location
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface PropertySummaryDTO {
@@ -77,6 +81,10 @@ export interface PropertySummaryDTO {
   isNew: boolean;
   landlordId: number;
   landlordName: string;
+
+  // Location
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface PaginatedResponse<T> {

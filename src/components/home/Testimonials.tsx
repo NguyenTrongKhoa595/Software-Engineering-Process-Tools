@@ -4,14 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const testimonials = [
   {
-    name: 'Sarah Johnson',
+    name: 'Donald Trump',
     role: 'Tenant',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+    image: 'https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcTu-GSY_bXjggu92Go8I0Od4bEoIE-RnSuaCRmN5xcL4lfSDQI169Wyg5hK0VegSLUJjpqlG47veDZ33C0',
     content: "Found my dream apartment in just 2 weeks! The filters made it super easy.",
     rating: 5,
   },
   {
-    name: 'Michael Chen',
+    name: 'Tri Huynh',
     role: 'Landlord',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
     content: "RentMate transformed how I manage properties. It's efficient and reliable.",

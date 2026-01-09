@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { propertyApi, PropertyResponseDTO, PropertySummaryDTO } from '@/lib/api/propertyApi';
 import { savedPropertiesApi } from '@/lib/api/savedPropertiesApi';
+import { PropertyMap } from '@/components/properties/PropertyMap';
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
@@ -297,6 +298,28 @@ export default function PropertyDetail() {
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-4">About This Property</h2>
                 <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+              </div>
+
+              {/* Map Section - "Where you'll be" */}
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-4">Where you'll be</h2>
+                <div className="h-[400px] rounded-lg overflow-hidden border border-border">
+                  <PropertyMap 
+                    properties={[{
+                      ...property,
+                      landlordId: property.landlord.id,
+                      landlordName: property.landlord.name,
+                      // Ensure compatibility
+                      status: property.status,
+                      coverImageUrl: property.coverImageUrl || null
+                    }]} 
+                    center={property.latitude && property.longitude ? [property.latitude, property.longitude] : undefined}
+                    zoom={15}
+                  />
+                </div>
+                <div className="mt-2 text-sm text-muted-foreground">
+                   {property.address}
+                </div>
               </div>
 
               {/* Amenities */}

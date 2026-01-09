@@ -9,7 +9,15 @@ import { setOnUnauthorized } from '@/lib/api/client';
 export type AuthUser = NormalizedUser;
 
 interface AuthContextType {
-// ... (existing interface)
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, fullName: string, role: UserRole) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmNewPassword: string) => Promise<{ success: boolean; error?: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

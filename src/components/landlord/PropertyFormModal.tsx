@@ -82,6 +82,8 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
   const [property, setProperty] = useState<PropertyResponseDTO | null>(null);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingPhotos, setExistingPhotos] = useState<{ id: number; url: string }[]>([]);
+  const [photoIdsToDelete, setPhotoIdsToDelete] = useState<number[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [newRule, setNewRule] = useState('');
 
@@ -117,10 +119,14 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
           availableFrom: data.availableFrom || '',
           minimumLease: String(data.minimumLease || 12),
         });
-        // Set existing images as previews
+        // Set existing images
         if (data.photos) {
+          setExistingPhotos(data.photos.map(p => ({ id: p.id, url: p.url })));
           setPreviewUrls(data.photos.map(p => p.url));
         }
+        // Reset delete list for new property
+        setPhotoIdsToDelete([]);
+        setSelectedFiles([]);
       } catch (error) {
         console.error('Failed to fetch property:', error);
         toast.error('Failed to load property');
@@ -137,6 +143,8 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
   const resetForm = () => {
     setFormData(initialFormData);
     setSelectedFiles([]);
+    setExistingPhotos([]);
+    setPhotoIdsToDelete([]);
     setPreviewUrls([]);
     setNewRule('');
   };
@@ -159,7 +167,24 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
   };
 
   const removeImage = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    const urlToRemove = previewUrls[index];
+    
+    // Check if this was an existing photo
+    const existingPhoto = existingPhotos.find(p => p.url === urlToRemove);
+    if (existingPhoto) {
+      setPhotoIdsToDelete(prev => [...prev, existingPhoto.id]);
+      setExistingPhotos(prev => prev.filter(p => p.id !== existingPhoto.id));
+    } else {
+      // It was a newly uploaded file
+      // We need to find which index in selectedFiles it matches
+      // This is a bit tricky since previewUrls is a combined list.
+      // previewUrls = [existingUrls..., uploadedUrls...]
+      const uploadedIndex = index - existingPhotos.length;
+      if (uploadedIndex >= 0) {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== uploadedIndex));
+      }
+    }
+
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -220,6 +245,7 @@ export function PropertyFormModal({ open, onClose, propertyId, onSave }: Propert
           availableFrom: formData.availableFrom || undefined,
           minimumLease: parseInt(formData.minimumLease) || 12,
           photos_to_add: selectedFiles.length > 0 ? selectedFiles : undefined,
+          photo_ids_to_delete: photoIdsToDelete.length > 0 ? photoIdsToDelete : undefined,
         });
         toast.success('Property updated successfully');
       } else {

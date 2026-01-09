@@ -61,8 +61,8 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <Home className="h-5 w-5 text-primary-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary overflow-hidden">
+              <img src="/favicon.ico" alt="RentMate Logo" className="h-full w-full object-cover" />
             </div>
             <span className="text-xl font-bold text-foreground">RentMate</span>
           </Link>

@@ -12,8 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const contactInfo = [
   { icon: Mail, title: 'Email', value: 'support@rentmate.com', href: 'mailto:support@rentmate.com' },
-  { icon: Phone, title: 'Phone', value: '+1 (555) 123-4567', href: 'tel:+15551234567' },
-  { icon: MapPin, title: 'Address', value: '123 Market Street, San Francisco, CA 94105', href: '#' },
+  { icon: Phone, title: 'Phone', value: '+84 (028) 3776 1300', href: 'tel:+842837761300' },
+  { icon: MapPin, title: 'Address', value: 'RMIT University, 702 Nguyen Van Linh, D7, HCMC', href: '#' },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri: 9AM-6PM PST', href: '#' },
 ];
 

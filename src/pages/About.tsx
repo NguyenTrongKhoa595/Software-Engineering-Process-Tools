@@ -6,24 +6,25 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 const stats = [
-  { value: '2019', label: 'Founded' },
-  { value: '50+', label: 'Team Members' },
-  { value: '10M+', label: 'Users Served' },
-  { value: '15', label: 'Cities' },
+  { value: '2024', label: 'Founded' },
+  { value: '5', label: 'Co-Founders' },
+  { value: 'RMIT', label: 'University' },
+  { value: 'HCM', label: 'Based In' },
 ];
 
 const values = [
-  { icon: Heart, title: 'Trust & Transparency', description: 'We believe in honest communication and verified listings to build lasting relationships.' },
-  { icon: Users, title: 'Community First', description: 'Our platform is built around creating meaningful connections between tenants and landlords.' },
-  { icon: Award, title: 'Quality Assurance', description: 'Every property is verified to ensure our users get exactly what they expect.' },
-  { icon: Target, title: 'Innovation', description: 'We continuously improve our platform to make renting simpler and more efficient.' },
+  { icon: Heart, title: 'Passion Driven', description: 'Built by students, for students and young professionals.' },
+  { icon: Users, title: 'Student Community', description: 'Understanding the real struggles of finding accommodation near campus.' },
+  { icon: Award, title: 'Academic Excellence', description: 'Applying top-tier software engineering practices to real-world problems.' },
+  { icon: Target, title: 'User Focus', description: 'Designed with the specific needs of the Vietnamese rental market in mind.' },
 ];
 
 const team = [
-  { name: 'Sarah Mitchell', role: 'CEO & Co-Founder', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300' },
-  { name: 'Michael Chen', role: 'CTO & Co-Founder', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300' },
-  { name: 'Emily Rodriguez', role: 'Head of Operations', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300' },
-  { name: 'James Wilson', role: 'Head of Product', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300' },
+  { name: 'Minh Tran', role: 'Co-Founder & Lead Developer', avatar: 'https://tse3.mm.bing.net/th/id/OIP.p9dffYnc0B_kLWOES8V7kAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3' },
+  { name: 'Khai Nguyen', role: 'Co-Founder & UI/UX Designer', avatar: 'https://cdn2.tuoitre.vn/thumb_w/480/ttc/r/2022/05/07/ngoc-son-doctor-strange-vietnam-1651900986.jpeg' },
+  { name: 'Quan Ngo', role: 'Co-Founder & Backend Engineer', avatar: 'https://wallpaperaccess.com/full/11719444.jpg' },
+  { name: 'Khoa Nguyen', role: 'Co-Founder & Frontend Engineer', avatar: 'https://img.freepik.com/free-vector/hand-drawn-nft-style-ape-illustration_23-2149622021.jpg' },
+  { name: 'Khoi Duong', role: 'Co-Founder & Product Manager', avatar: 'https://wallpapercave.com/wp/wp11156474.jpg' },
 ];
 
 export default function About() {
@@ -37,7 +38,7 @@ export default function About() {
           <div className="container-custom text-center">
             <h1 className="text-display-md font-bold text-foreground mb-6">About RentMate</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              We're on a mission to make finding and renting homes easier, faster, and more trustworthy for everyone.
+              A student-led initiative from RMIT University to revolutionize the rental experience in Vietnam.
             </p>
           </div>
         </section>
@@ -64,20 +65,20 @@ export default function About() {
                 <h2 className="text-display-sm font-bold text-foreground mb-6">Our Story</h2>
                 <div className="space-y-4 text-muted-foreground">
                   <p>
-                    RentMate was born out of frustration. Our founders, Sarah and Michael, spent months searching for apartments in San Francisco, dealing with unresponsive landlords, misleading listings, and complicated application processes.
+                    RentMate wasn't started in a boardroom; it began in a classroom at RMIT University Vietnam. As students, we personally experienced the chaotic and often untrustworthy process of finding rental accommodation in Ho Chi Minh City.
                   </p>
                   <p>
-                    They knew there had to be a better way. In 2019, they launched RentMate with a simple vision: create a platform where renters could find verified properties and landlords could connect with quality tenants—all in one seamless experience.
+                    From fake listings to unresponsive agents, the struggle was real. We realized that if we were facing these issues, thousands of other students and young professionals were too. That's when we decided to combine our passion for technology with our desire to solve a real community problem.
                   </p>
                   <p>
-                    Today, RentMate has helped millions of people find their perfect home and enabled thousands of landlords to manage their properties more efficiently. But we're just getting started.
+                    We are a team of 5 passionate students—Minh, Khai, Quan, Khoa, and Khoi—who came together to build a platform based on trust, transparency, and ease of use. RentMate is our answer to the question: "Why is renting still so hard?"
                   </p>
                 </div>
               </div>
               <div className="relative">
                 <img 
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600" 
-                  alt="Team collaboration"
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600" 
+                  alt="RMIT Team collaboration"
                   className="rounded-2xl shadow-xl"
                 />
               </div>
@@ -97,7 +98,7 @@ export default function About() {
                   <h3 className="text-xl font-bold text-foreground">Our Mission</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  To simplify the rental experience by connecting quality tenants with verified properties, making the process transparent, efficient, and stress-free for everyone involved.
+                  To provide a safe, verified, and transparent rental marketplace for the student community and young professionals in Vietnam.
                 </p>
               </Card>
               <Card className="p-8">
@@ -108,7 +109,7 @@ export default function About() {
                   <h3 className="text-xl font-bold text-foreground">Our Vision</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  To become the most trusted rental platform globally, where finding a home feels as natural as finding a friend—built on trust, transparency, and technology.
+                  To be the go-to housing platform for every university student in Vietnam, setting a new standard for quality and trust in the rental market.
                 </p>
               </Card>
             </div>
@@ -121,7 +122,7 @@ export default function About() {
             <div className="text-center mb-12">
               <h2 className="text-display-sm font-bold text-foreground mb-4">Our Values</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                These principles guide every decision we make and every feature we build.
+                Driven by youthful energy and professional standards.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -142,18 +143,18 @@ export default function About() {
         <section className="section-padding bg-muted/30">
           <div className="container-custom">
             <div className="text-center mb-12">
-              <h2 className="text-display-sm font-bold text-foreground mb-4">Meet Our Team</h2>
-              <p className="text-muted-foreground">The people behind RentMate</p>
+              <h2 className="text-display-sm font-bold text-foreground mb-4">Meet The Team</h2>
+              <p className="text-muted-foreground">The RMIT students behind the screen</p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid justify-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {team.map((member, index) => (
                 <Card key={index} className="overflow-hidden card-hover">
-                  <div className="aspect-square overflow-hidden">
-                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                  <div className="aspect-square overflow-hidden bg-muted">
+                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                   </div>
                   <CardContent className="p-4 text-center">
-                    <h3 className="font-semibold text-foreground">{member.name}</h3>
-                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                    <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                    <p className="text-xs text-muted-foreground">{member.role}</p>
                   </CardContent>
                 </Card>
               ))}

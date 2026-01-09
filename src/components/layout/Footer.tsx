@@ -11,8 +11,8 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <Home className="h-5 w-5 text-primary-foreground" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary overflow-hidden">
+                <img src="/favicon.ico" alt="RentMate Logo" className="h-full w-full object-cover" />
               </div>
               <span className="text-xl font-bold">RentMate</span>
             </Link>
@@ -52,6 +52,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li><Link to="/auth?mode=signup&role=tenant" className="text-muted-foreground hover:text-background transition-colors">Tenant Sign Up</Link></li>
               <li><Link to="/auth?mode=signup&role=landlord" className="text-muted-foreground hover:text-background transition-colors">Landlord Sign Up</Link></li>
+              <li><Link to="/auth?mode=signup&role=property-manager" className="text-muted-foreground hover:text-background transition-colors">Property Manager Sign Up</Link></li>
               <li><a href="#" className="text-muted-foreground hover:text-background transition-colors">Privacy Policy</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-background transition-colors">Terms of Service</a></li>
             </ul>

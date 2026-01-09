@@ -426,7 +426,7 @@ export default function PropertyDetail() {
                 {relatedProperties.map((relatedProperty) => (
                   <Link 
                     key={relatedProperty.id} 
-                    to={`/property/${relatedProperty.id}`}
+                    to={`/properties/${relatedProperty.id}`}
                     className="group"
                   >
                     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
